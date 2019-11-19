@@ -23,13 +23,18 @@ package casia.isi.elasticsearch.monitor.alarm;
  * 　　　　　　　　　 ┗┻┛　 ┗┻┛+ + + +
  */
 
+import casia.isi.elasticsearch.monitor.common.SysConstant;
+import casia.isi.elasticsearch.monitor.entity.MailBean;
+import casia.isi.elasticsearch.monitor.service.ElasticStatistics;
+import casia.isi.elasticsearch.monitor.service.MailService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
  * @author YanchaoMa yanchaoma@foxmail.com
  * @PACKAGE_NAME: casia.isi.elasticsearch.monitor.alarm
- * @Description: TODO(Describe the role of this JAVA class)
+ * @Description: TODO(SCHEDULE TASK)
  * @date 2019/11/15 17:14
  */
 @Component
@@ -54,9 +59,16 @@ public class ScheduledTask {
 //    0 0 3 ? * L	每周星期六凌晨3点触发
 //
 //    0 11,22,33 * * * ?	每小时11分、22分、33分触发
+//
+//    0/10 * * * * ? 每10秒执行一次
 
+    @Autowired
+    private MailService mailService;
 
-    @Scheduled(cron = "0/10 * * * * ?") //每10秒执行一次
+    @Autowired
+    private ElasticStatistics elastic;
+
+    @Scheduled(cron = "0 00 09 * * ?") // 每天早上九点触发
     public void scheduledTaskByCorn() {
         scheduledTask();
     }
@@ -72,12 +84,17 @@ public class ScheduledTask {
 //    }
 
     private void scheduledTask() {
+        MailBean mailBean = new MailBean();
+        mailBean.setReceiver(SysConstant.EMAIL_RECEIVER);
+        mailBean.setSubject("[Daily Report]-CASIA AliYun Elasticsearch Monitor");
+        mailBean.setContent(elastic.statisticsToAlarm().toJSONString());
+
         try {
-            System.out.println("Timer...");
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
+            mailService.sendSimpleMail(mailBean);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 }
+

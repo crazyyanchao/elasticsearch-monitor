@@ -29,12 +29,12 @@ spring:
     static-locations: classpath:/static/
   mail:
     host: smtp.163.com
-    #发送者邮箱账号
+    # 发送者邮箱账号
     username: 18511085575@163.com
-    #发送者密钥
-    password: 123456alarm
+    # 发送者密钥
+    password: alarm123456bili
     default-encoding: utf-8
-    port: 465   #端口号465或587
+    port: 465   # 端口号465或587
     protocol: smtp
     properties:
       mail:

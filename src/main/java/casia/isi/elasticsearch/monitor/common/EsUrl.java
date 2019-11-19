@@ -34,7 +34,7 @@ public enum EsUrl {
     _cluster_state_all("/_cluster/state/_all"),
 
     // 查看所有索引MAPPING
-    _mapping("_mapping");
+    _mapping("/_mapping");
 
     private String url;
 

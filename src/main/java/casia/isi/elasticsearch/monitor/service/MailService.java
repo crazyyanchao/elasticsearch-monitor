@@ -1,6 +1,8 @@
 package casia.isi.elasticsearch.monitor.service;
 
 import casia.isi.elasticsearch.monitor.entity.MailBean;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,24 +33,27 @@ public class MailService {
     private static String projectPath = StringUtils
             .substringBefore(System.getProperty("user.dir").replaceAll("\\\\", "/"), "/");
 
-
     static {
         System.setProperty("mail.mime.splitlongparameters", "false");
     }
 
-
     /**
-     * 发送简易邮件
+     * @param
+     * @return
+     * @Description: TODO(SIMPLE EMAIL SEND)
      */
     @Async
     public void sendSimpleMail(MailBean mailBean) throws Exception {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(from);//发送方
-        message.setTo(mailBean.getReceiver().split(";"));//接收者
-        message.setSubject(mailBean.getSubject());//主题
-        message.setText(mailBean.getContent());//内容
+        message.setFrom(from); // SENDER
+        String[] receivers = mailBean.getReceiver().split(";");
+        message.setTo(receivers); // RECEIVER
+        message.setSubject(mailBean.getSubject()); // TOPIC
+        message.setText(mailBean.getContent()); // CONTENT
         javaMailSender.send(message);
-        logger.info("简单邮件已经发送。");
+        logger.info("Simple email already send! INFO[" +
+                "SENDER:" + from + "," +
+                "RECEIVER:" + JSONArray.parseArray(JSON.toJSONString(receivers)).toJSONString() + "]");
     }
 
     /**
@@ -159,5 +164,5 @@ public class MailService {
 
     }
 
-
 }
+

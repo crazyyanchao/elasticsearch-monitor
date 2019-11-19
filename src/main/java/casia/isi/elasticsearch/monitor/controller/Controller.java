@@ -23,15 +23,18 @@ package casia.isi.elasticsearch.monitor.controller;
  * 　　　　　　　　　 ┗┻┛　 ┗┻┛+ + + +
  */
 
-import casia.isi.elasticsearch.monitor.alarm.ElasticStatistics;
+import casia.isi.elasticsearch.monitor.service.ElasticStatistics;
 import casia.isi.elasticsearch.monitor.common.Message;
+import casia.isi.elasticsearch.monitor.common.SysConstant;
 import casia.isi.elasticsearch.monitor.entity.MailBean;
 import casia.isi.elasticsearch.monitor.service.MailService;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author YanchaoMa yanchaoma@foxmail.com
@@ -46,10 +49,13 @@ public class Controller {
     @Autowired
     private MailService mailService;
 
+    @Autowired
+    private ElasticStatistics elasticStatistics;
+
     /**
      * @param
      * @return
-     * @Description: TODO(Monitor Instrument Index)http://localhost:7100/monitor/
+     * @Description: TODO(Monitor Instrument Index) http://localhost:7100/monitor/
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(ModelMap modelMap) {
@@ -63,20 +69,33 @@ public class Controller {
      * @Description: TODO(SEND EMAIL)
      */
     @RequestMapping(value = "/send-email", method = RequestMethod.GET)
+    @ResponseBody
     public String sendEmail(ModelMap modelMap) {
         modelMap.put("msg", "Send Email");
 
-        ElasticStatistics elastic=new ElasticStatistics();
-
         MailBean mailBean = new MailBean();
-        mailBean.setReceiver("yanchaoma@foxmail.com");
-        mailBean.setContent(elastic.recentThreeDaysIndexStatus().toJSONString());
+        mailBean.setReceiver(SysConstant.EMAIL_RECEIVER);
+        mailBean.setContent(elasticStatistics.statisticsToAlarm().toJSONString());
+        mailBean.setSubject("[Daily Report]-CASIA AliYun Elasticsearch Monitor");
         try {
             mailService.sendSimpleMail(mailBean);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Message.send(true).toJSONString();
+        return new Message().send(true).toJSONString();
     }
 
+    /**
+     * @param
+     * @return
+     * @Description: TODO(ALARM STATISTICS)
+     */
+    @RequestMapping(value = "/alarm-statistics", method = RequestMethod.GET)
+    @ResponseBody
+    public String alarmStatistics(ModelMap modelMap) {
+        modelMap.put("msg", "Alarm Statistics");
+        JSONObject result = elasticStatistics.statisticsToAlarm();
+        return new Message().send(true).putResult(result).toJSONString();
+    }
 }
+

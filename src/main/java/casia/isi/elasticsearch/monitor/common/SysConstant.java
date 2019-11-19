@@ -42,6 +42,7 @@ public class SysConstant {
     public static final String MONITOR_INDEX_TYPE = loadProperty("monitor.index.type");
     public static final String ALARM_STATUS_TIME = loadProperty("alarm.status.time");
     public static final String EMAIL_RECEIVER = loadProperty("email.receiver");
+    public static final String ELASTICSEARCH_TIME_FIELD = loadProperty("elasticsearch.time.field");
 
     /**
      * @param

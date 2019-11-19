@@ -1,4 +1,5 @@
-package casia.isi.elasticsearch.monitor.common;/**
+package casia.isi.elasticsearch.monitor.common;
+/**
  * 　　　　　　　 ┏┓       ┏┓+ +
  * 　　　　　　　┏┛┻━━━━━━━┛┻┓ + +
  * 　　　　　　　┃　　　　　　 ┃
@@ -32,10 +33,19 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class Message {
 
-    public static JSONObject send(boolean bool) {
-        JSONObject object = new JSONObject();
-        object.put("status", true);
-        return object;
+    private JSONObject object = new JSONObject();
+
+    public Message send(boolean bool) {
+        this.object.put("status", true);
+        return this;
     }
 
+    public Message putResult(JSONObject result) {
+        this.object.put("result", result);
+        return this;
+    }
+
+    public String toJSONString() {
+        return this.object.toJSONString();
+    }
 }
