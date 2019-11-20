@@ -23,13 +23,26 @@ package casia.isi.elasticsearch.monitor.alarm;
  * 　　　　　　　　　 ┗┻┛　 ┗┻┛+ + + +
  */
 
+import casia.isi.elasticsearch.common.FieldOccurs;
+import casia.isi.elasticsearch.common.RangeOccurs;
+import casia.isi.elasticsearch.monitor.common.EsUrl;
 import casia.isi.elasticsearch.monitor.common.SysConstant;
 import casia.isi.elasticsearch.monitor.entity.MailBean;
 import casia.isi.elasticsearch.monitor.service.ElasticStatistics;
 import casia.isi.elasticsearch.monitor.service.MailService;
+import casia.isi.elasticsearch.operation.delete.EsIndexDelete;
+import casia.isi.elasticsearch.operation.index.EsIndexCreat;
+import casia.isi.elasticsearch.util.DateUtil;
+import casia.isi.elasticsearch.util.StringUtil;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author YanchaoMa yanchaoma@foxmail.com
@@ -68,22 +81,38 @@ public class ScheduledTask {
     @Autowired
     private ElasticStatistics elastic;
 
-    @Scheduled(cron = "0 00 09 * * ?") // 每天早上九点触发
+    private EsIndexCreat esIndexCreat = new EsIndexCreat(SysConstant.ELASTICSEARCH_ADDRESS, SysConstant._MONITOR_TASK_INDEX_NAME
+            , SysConstant._MONITOR_TASK_INDEX_TYPE);
+    private EsIndexDelete esIndexDelete = new EsIndexDelete(SysConstant.ELASTICSEARCH_ADDRESS, SysConstant._MONITOR_TASK_INDEX_NAME
+            , SysConstant._MONITOR_TASK_INDEX_TYPE);
+
+    @Scheduled(cron = "0 00 05 * * ?") // 每天凌晨5点触发
     public void scheduledTaskByCorn() {
-        scheduledTask();
+        statisticsTask();
     }
 
-//    @Scheduled(fixedRate = 10000) //每10秒执行一次
-//    public void scheduledTaskByFixedRate() {
-//        scheduledTask();
-//    }
+    @Scheduled(fixedRate = 5000) //每5秒执行一次
+    public void scheduledTaskByFixedRate() throws Exception {
+        monitorBackstageTask();
+    }
+
+    @Scheduled(cron = "0 30 04 * * ?") // 每天凌晨4点30分触发
+    public void deleteMonitorBackstageTaskIndex() {
+        deleteMonitorBackstageTask();
+    }
+
 //
 //    @Scheduled(fixedDelay = 10000) //每10秒执行一次
 //    public void scheduledTaskByFixedDelay() {
 //        scheduledTask();
 //    }
 
-    private void scheduledTask() {
+    /**
+     * @param
+     * @return
+     * @Description: TODO(统计集群索引的数据量 - 按天统计和最近一段时间)
+     */
+    private void statisticsTask() {
         MailBean mailBean = new MailBean();
         mailBean.setReceiver(SysConstant.EMAIL_RECEIVER);
         mailBean.setSubject("[Daily Report]-CASIA AliYun Elasticsearch Monitor");
@@ -94,6 +123,93 @@ public class ScheduledTask {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(后台运行TASK监控)
+     */
+    private void monitorBackstageTask() throws Exception {
+
+        // 检查 INDEX:.monitor_task_alarm TYPE:task 索引是否存在
+        if (!esIndexCreat.isIndexName()) {
+            esIndexCreat.singleMapping("/" + SysConstant._MONITOR_TASK_INDEX_NAME, "mapping" + File.separator + ".monitor_task_alarm.json");
+        }
+        // 封装数据
+        List<JSONObject> dataList = backstageTaskData();
+        esIndexCreat.index(dataList, "task_id");
+
+    }
+
+    private List<JSONObject> backstageTaskData() {
+        List<JSONObject> dataList = new ArrayList<>();
+        String response = esIndexCreat.httpRequest.httpGet(EsUrl._tasks.url());
+        JSONObject result = JSONObject.parseObject(response);
+
+        if (result != null && !result.isEmpty()) {
+            JSONObject nodes = result.getJSONObject("nodes");
+            for (Map.Entry entry : nodes.entrySet()) {
+                JSONObject value = (JSONObject) entry.getValue();
+                JSONObject tasks = value.getJSONObject("tasks");
+
+                for (Map.Entry taskMap : tasks.entrySet()) {
+                    String taskId = String.valueOf(taskMap.getKey());
+                    JSONObject taskInfo = (JSONObject) taskMap.getValue();
+                    taskInfo.put("task_id", taskId);
+                    long start_time_in_millis = taskInfo.getLongValue("start_time_in_millis");
+                    taskInfo.put("start_time", DateUtil.millToTimeStr(start_time_in_millis));
+                    dataList.add(taskInfo);
+                }
+
+            }
+        }
+        return dataList;
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(监控删除TASK索引的数据)
+     */
+    private void deleteMonitorBackstageTask() {
+
+        esIndexDelete.setDebug(SysConstant.DEBUG);
+
+        String currentThreadTime = getCurrentThreadTime();
+
+        esIndexDelete.addRangeTerms("start_time", currentThreadTime, FieldOccurs.MUST, RangeOccurs.LTE);
+        esIndexDelete.setRefresh("wait_for");
+        esIndexDelete.setScrollSize(1000);
+        esIndexDelete.conflictsProceed("proceed");
+        esIndexDelete.setWaitForCompletion(false);
+        esIndexDelete.execute();
+
+        // FORCE MERGE
+        esIndexDelete.forceMerge();
+
+        esIndexDelete.reset();
+    }
+
+    private String getCurrentThreadTime() {
+        long mill = System.currentTimeMillis() - dhmToMill(SysConstant._MONITOR_TASK_INDEX_RETAIN_TIME);
+        return DateUtil.millToTimeStr(mill);
+    }
+
+    private long dhmToMill(String dhmStr) {
+        if (dhmStr != null && !"".equals(dhmStr)) {
+            int number = Integer.valueOf(StringUtil.cutNumber(dhmStr));
+            if (dhmStr.contains("d")) {
+                return number * 86400000l;
+            } else if (dhmStr.contains("h")) {
+                return number * 3600000l;
+            } else if (dhmStr.contains("m")) {
+                return number * 60000l;
+            } else if (dhmStr.contains("s")) {
+                return number * 1000l;
+            }
+        }
+        return 0l;
     }
 
 }

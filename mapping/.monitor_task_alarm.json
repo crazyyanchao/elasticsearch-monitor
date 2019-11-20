@@ -1,0 +1,68 @@
+{
+  "mappings": {
+    "task": {
+      "dynamic": "false",
+      "_source": {
+        "enabled": true
+      },
+      "properties": {
+        "task_id": {
+          "index": "not_analyzed",
+          "store": true,
+          "type": "keyword"
+        },
+        "node": {
+          "index": "not_analyzed",
+          "store": true,
+          "type": "keyword"
+        },
+        "id": {
+          "index": "not_analyzed",
+          "store": true,
+          "type": "long"
+        },
+        "type": {
+          "index": "not_analyzed",
+          "store": true,
+          "type": "keyword"
+        },
+        "action": {
+          "index": "not_analyzed",
+          "store": true,
+          "type": "keyword"
+        },
+        "start_time_in_millis": {
+          "index": "not_analyzed",
+          "store": true,
+          "type": "long"
+        },
+        "running_time_in_nanos": {
+          "index": "not_analyzed",
+          "store": true,
+          "type": "long"
+        },
+        "cancellable": {
+          "index": "not_analyzed",
+          "store": true,
+          "type": "keyword"
+        },
+        "parent_task_id": {
+          "index": "not_analyzed",
+          "store": true,
+          "type": "keyword"
+        },
+        "start_time": {
+          "format": "yyyy-MM-dd HH:mm:ss",
+          "store": true,
+          "type": "date"
+        }
+      }
+    }
+  },
+  "settings": {
+    "number_of_replicas": 0,
+    "number_of_shards": 1
+  }
+}
+
+

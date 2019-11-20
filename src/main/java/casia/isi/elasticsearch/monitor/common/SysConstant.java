@@ -44,6 +44,12 @@ public class SysConstant {
     public static final String EMAIL_RECEIVER = loadProperty("email.receiver");
     public static final String ELASTICSEARCH_TIME_FIELD = loadProperty("elasticsearch.time.field");
 
+    public static final String _MONITOR_TASK_INDEX_NAME = loadProperty(".monitor.task.index.name");
+    public static final String _MONITOR_TASK_INDEX_TYPE = loadProperty(".monitor.task.index.type");
+    public static final String _MONITOR_TASK_INDEX_RETAIN_TIME = loadProperty(".monitor.task.index.retain.time");
+
+    public static final boolean DEBUG = Boolean.parseBoolean(loadProperty("debug"));
+
     /**
      * @param
      * @return

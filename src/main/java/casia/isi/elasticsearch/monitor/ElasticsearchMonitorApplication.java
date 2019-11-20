@@ -2,15 +2,12 @@ package casia.isi.elasticsearch.monitor;
 
 import casia.isi.elasticsearch.monitor.common.SysConstant;
 import org.apache.catalina.connector.Connector;
-import org.apache.log4j.PropertyConfigurator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import java.io.File;
 
 /**
  * @author YanchaoMa yanchaoma@foxmail.com
