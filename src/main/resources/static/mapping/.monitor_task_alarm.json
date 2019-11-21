@@ -27,9 +27,9 @@
           "type": "keyword"
         },
         "action": {
-          "index": "not_analyzed",
+          "analyzer": "standard",
           "store": true,
-          "type": "keyword"
+          "type": "text"
         },
         "start_time_in_millis": {
           "index": "not_analyzed",
@@ -55,6 +55,11 @@
           "format": "yyyy-MM-dd HH:mm:ss",
           "store": true,
           "type": "date"
+        },
+        "description": {
+          "analyzer": "standard",
+          "store": true,
+          "type": "text"
         }
       }
     }

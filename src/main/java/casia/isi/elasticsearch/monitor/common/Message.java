@@ -23,6 +23,7 @@ package casia.isi.elasticsearch.monitor.common;
  * 　　　　　　　　　 ┗┻┛　 ┗┻┛+ + + +
  */
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -41,6 +42,16 @@ public class Message {
     }
 
     public Message putResult(JSONObject result) {
+        this.object.put("result", result);
+        return this;
+    }
+
+    public Message putResult(String result) {
+        this.object.put("result", result);
+        return this;
+    }
+
+    public Message putResult(JSONArray result) {
         this.object.put("result", result);
         return this;
     }

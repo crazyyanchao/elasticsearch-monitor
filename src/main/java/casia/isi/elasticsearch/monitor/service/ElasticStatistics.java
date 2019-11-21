@@ -23,6 +23,9 @@ package casia.isi.elasticsearch.monitor.service;
  * 　　　　　　　　　 ┗┻┛　 ┗┻┛+ + + +
  */
 
+import casia.isi.elasticsearch.common.FieldOccurs;
+import casia.isi.elasticsearch.common.RangeOccurs;
+import casia.isi.elasticsearch.common.SortOrder;
 import casia.isi.elasticsearch.monitor.common.EsUrl;
 import casia.isi.elasticsearch.monitor.common.SysConstant;
 import casia.isi.elasticsearch.operation.http.HttpPoolSym;
@@ -31,6 +34,7 @@ import casia.isi.elasticsearch.operation.http.HttpProxyRequest;
 import casia.isi.elasticsearch.operation.search.EsIndexSearch;
 import casia.isi.elasticsearch.util.ClientUtils;
 import casia.isi.elasticsearch.util.DateUtil;
+import casia.isi.elasticsearch.util.MD5Digest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -150,7 +154,7 @@ public class ElasticStatistics {
         statistics.put("SEVERAL_DAYS_STATISTICS", severalDays);
         statistics.put("CRAWL_STATISTICS_24H", oneDay);
         statistics.put("ALARM_CRAWL_EMPTY_24H", filterEmptyCountIndex(oneDay));
-        statistics.put("explain","最近24小时没有进入新数据的索引[ALARM_CRAWL_EMPTY_24H]");
+        statistics.put("explain", "最近24小时没有进入新数据的索引[ALARM_CRAWL_EMPTY_24H]");
         return statistics;
     }
 
@@ -163,6 +167,62 @@ public class ElasticStatistics {
                 .collect(Collectors.toCollection(JSONArray::new));
     }
 
+    /**
+     * @param
+     * @return
+     * @Description: TODO(删除任务的执行状态)
+     */
+    public JSONObject detectDeleter() {
+        esIndexSearch = new EsIndexSearch(SysConstant.ELASTICSEARCH_ADDRESS, ".tasks", "task");
+
+        // 获取最近24H的任务
+        long millTime = System.currentTimeMillis() - 86_400_000L;
+        esIndexSearch.addRangeTerms("task.start_time_in_millis", String.valueOf(millTime), FieldOccurs.MUST, RangeOccurs.GTE);
+        esIndexSearch.addSortField("task.start_time_in_millis", SortOrder.ASC);
+        esIndexSearch.setRow(10000);
+        esIndexSearch.execute(new String[]{"task.description", "task.start_time_in_millis", "task.node", "task.id", "task.type",
+                "task.action", "task.running_time_in_nanos", "task.cancellable", "task.parent_task_id", "task.status", "response"});
+        JSONObject result = esIndexSearch.queryJsonResult;
+        JSONArray hits = result.getJSONObject("hits").getJSONArray("hits");
+        esIndexSearch.reset();
+        return countDeleteQueryTask(hits);
+    }
+
+    private JSONObject countDeleteQueryTask(JSONArray hits) {
+        JSONObject md5Task = new JSONObject();
+        for (Object object : hits) {
+            JSONObject task = (JSONObject) object;
+            String taskId = task.getString("_id");
+            JSONObject taskObj = task.getJSONObject("_source").getJSONObject("task");
+            JSONObject responseObj = task.getJSONObject("_source").getJSONObject("response");
+            taskObj.put("response", responseObj);
+            String md5 = MD5Digest.MD5(taskObj.getString("description"));
+            taskObj.put("task_id", taskId);
+            // TRANSFER TIME
+            taskObj.put("start_time", DateUtil.millToTimeStr(taskObj.getLongValue("start_time_in_millis")));
+            if (md5Task.containsKey(md5)) {
+                JSONObject taskCur = md5Task.getJSONObject(md5);
+                taskObj.put("count", taskCur.getInteger("count") + 1);
+                md5Task.put(md5, taskObj);
+            } else {
+                taskObj.put("count", 1);
+                md5Task.put(md5, taskObj);
+            }
+        }
+        md5Task.put("_delete_query_execute_count", md5Task.size());
+        return md5Task;
+    }
+
+    public String getReportText() {
+        JSONObject deleterObj = detectDeleter();
+        JSONObject statisticsObj = statisticsToAlarm();
+        return new StringBuilder()
+                .append("❤集群索引数量：" + getAllIndices().size() + "\r\n")
+                .append("❤24H运行的数据删除任务数量：" + deleterObj.getIntValue("_delete_query_execute_count") + "\r\n")
+                .append("❤24H数据删除任务详细信息：" + deleterObj.toJSONString() + "\r\n")
+                .append("❤集群所有索引数据量统计：" + statisticsObj.toJSONString() + "\r\n")
+                .toString();
+    }
 }
 
 

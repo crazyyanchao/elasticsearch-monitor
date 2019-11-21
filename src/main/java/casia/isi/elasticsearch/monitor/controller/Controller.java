@@ -28,7 +28,6 @@ import casia.isi.elasticsearch.monitor.common.Message;
 import casia.isi.elasticsearch.monitor.common.SysConstant;
 import casia.isi.elasticsearch.monitor.entity.MailBean;
 import casia.isi.elasticsearch.monitor.service.MailService;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -75,7 +74,7 @@ public class Controller {
 
         MailBean mailBean = new MailBean();
         mailBean.setReceiver(SysConstant.EMAIL_RECEIVER);
-        mailBean.setContent(elasticStatistics.statisticsToAlarm().toJSONString());
+        mailBean.setContent(elasticStatistics.getReportText());
         mailBean.setSubject("[Daily Report]-CASIA AliYun Elasticsearch Monitor");
         try {
             mailService.sendSimpleMail(mailBean);
@@ -94,8 +93,66 @@ public class Controller {
     @ResponseBody
     public String alarmStatistics(ModelMap modelMap) {
         modelMap.put("msg", "Alarm Statistics");
-        JSONObject result = elasticStatistics.statisticsToAlarm();
-        return new Message().send(true).putResult(result).toJSONString();
+        return new Message().send(true)
+                .putResult(elasticStatistics.getReportText())
+                .toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(GET ALL INDICES)
+     */
+    @RequestMapping(value = "/get-all-indices", method = RequestMethod.GET)
+    @ResponseBody
+    public String getAllIndices(ModelMap modelMap) {
+        modelMap.put("msg", "Get all indices");
+        return new Message().send(true)
+                .putResult(elasticStatistics.getAllIndices())
+                .toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(24H STATISTICS)
+     */
+    @RequestMapping(value = "/24h-statistics", method = RequestMethod.GET)
+    @ResponseBody
+    public String get24HStatistics(ModelMap modelMap) {
+        modelMap.put("msg", "Get all indices");
+        return new Message().send(true)
+                .putResult(elasticStatistics.recentOneDaysIndexStatus())
+                .toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(7D STATISTICS)
+     */
+    @RequestMapping(value = "/7d-statistics", method = RequestMethod.GET)
+    @ResponseBody
+    public String get7DStatistics(ModelMap modelMap) {
+        modelMap.put("msg", "Get all indices");
+        return new Message().send(true)
+                .putResult(elasticStatistics.recentSeveralDaysIndexStatus())
+                .toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(DELETE STATISTICS)
+     */
+    @RequestMapping(value = "/delete-statistics", method = RequestMethod.GET)
+    @ResponseBody
+    public String getDeleteStatistics(ModelMap modelMap) {
+        modelMap.put("msg", "Get all indices");
+        return new Message().send(true)
+                .putResult(elasticStatistics.detectDeleter())
+                .toJSONString();
     }
 }
+
 
