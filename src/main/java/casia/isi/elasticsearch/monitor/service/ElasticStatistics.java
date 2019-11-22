@@ -217,7 +217,7 @@ public class ElasticStatistics {
         JSONObject statisticsObj = statisticsToAlarm();
         return new StringBuilder()
                 .append("❤集群索引数量：" + getAllIndices().size() + "\r\n")
-                .append("❤24H运行的数据删除任务数量：" + deleterObj.getIntValue("_delete_query_execute_count") + "\r\n")
+                .append("❤24H运行的数据删除任务数量：" + deleterObj.size() + "\r\n")
                 .append("❤24H数据删除任务详细信息：" + deleterObj.toJSONString() + "\r\n")
                 .append("❤集群所有索引数据量统计：" + statisticsObj.toJSONString() + "\r\n")
                 .toString();
