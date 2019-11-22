@@ -1,0 +1,50 @@
+
+#box {
+    width: 600px;
+    margin: -11px auto;
+    font-family: 'Microsoft YaHei';
+    font-size: 32px;
+}
+
+input {
+    width: 260px;
+    border: 1px solid #e2e2e2;
+    height: 30px;
+    float: left;
+    /*background-image: url(path/images/search.jpg);*/
+    background-repeat: no-repeat;
+    background-size: 25px;
+    background-position: 5px center;
+    padding: 0 0 0 40px;
+}
+
+#logo {
+    width: 600px;
+    height: 55px;
+    float: right;
+    background: #d40b07;
+    color: white;
+    text-align: center;
+    line-height: 50px;
+    cursor: pointer;
+}
+
+#send_assign_email {
+    width: 78px;
+    height: 32px;
+    float: right;
+    background: black;
+    color: white;
+    text-align: center;
+    line-height: 32px;
+    cursor: pointer;
+}
+
+#view_alarm {
+    /*width: 100px;*/
+    /*height: 100px;*/
+    background: #3F51B5;
+    font-family: cursive;
+    font-size: larger;
+}
+

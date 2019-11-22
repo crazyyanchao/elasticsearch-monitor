@@ -1,251 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>ELASTICSEARCH CRAWL MONITOR</title>
     <meta name="description" content="">
     <meta name="keywords" content="">
-    <link href="" rel="stylesheet">
-    <style type="text/css">
-        #box {
-            width: 600px;
-            margin: -11px auto;
-            font-family: 'Microsoft YaHei';
-            font-size: 32px;
-        }
 
-        /*input {*/
-            /*width: 260px;*/
-            /*border: 1px solid #e2e2e2;*/
-            /*height: 30px;*/
-            /*float: left;*/
-            /*!*background-image: url(http://localhost:7100/monitor/path/images/search.jpg);*!*/
-            /*background-repeat: no-repeat;*/
-            /*background-size: 25px;*/
-            /*background-position: 5px center;*/
-            /*padding: 0 0 0 40px;*/
-        /*}*/
-
-        /*#search {*/
-            /*width: 600px;*/
-            /*height: 55px;*/
-            /*float: right;*/
-            /*background: #d40b07;*/
-            /*color: white;*/
-            /*text-align: center;*/
-            /*line-height: 50px;*/
-            /*cursor: pointer;*/
-        /*}*/
-
-        #send_assign_email {
-            width: 78px;
-            height: 32px;
-            float: right;
-            background: black;
-            color: white;
-            text-align: center;
-            line-height: 32px;
-            cursor: pointer;
-        }
-
-    </style>
+    <link href="path/css/jquery.json-viewer.css" rel="stylesheet">
+    <link href="path/css/loading.css" rel="stylesheet">
+    <link href="path/css/other.css" rel="stylesheet">
 </head>
-<!--<body style="background: url(http://localhost:7100/monitor/path/images/bg.jpg);">-->
 
-<a href="http://106.75.136.149:61239/#/connect">ELASTICSEARCH CRAWL MONITOR</a>
+<!--<body style="background: url(path/images/bg.jpg);">-->
+<li class="active"><a href="http://106.75.136.149:61239/#/connect">ELASTICSEARCH CRAWL MONITOR</a></li>
 
 <body>
+
+<script type='text/javascript' src="path/js/d3.js" charset="utf-8"></script>
+<script type='text/javascript' src='path/js/jquery-2.2.4.min.js'></script>
+<script src="path/js/jquery.json-viewer.js"></script>
+
+<div id="loading">
+    <div class="loadingImage"></div>
+</div>
+
 <div id="box" style="position:  relative;">
-    <!--<h4 style="color: #c0c0c09c;display:  inline-block;position:  absolute;width:  452px;right: 401px;top: -30px;height: auto;">-->
-    <!--问答举例-->
-    <!--</h4>-->
     <div style="float: left;">
-        <!--<input type="text" name="search" id="A" placeholder="请输入关键字">-->
-        <div id="search">ELASTICSEARCH监控平台</div>
+        <div id="logo">ELASTICSEARCH监控平台</div>
     </div>
-    <!--<h4 style="color: #c0c0c09c;display:  inline-block;position:  absolute;width:  477px;right: -507px;top: -30px;height: auto;">-->
-    <!--Keyword Tips-->
-    <!--</h4>-->
-    <!--<h4 style="color: #c0c0c09c;display:  inline-block;position:  absolute;width:  452px;right: 401px;top: 44px;height: auto;">-->
-    <!--功能备注-->
-    <!--</h4>-->
 </div>
 <div id="view_alarm" style="position:  relative;">
-    <div>
-        <a style="color: rgba(19,33,212,0.89);display:  inline-block;position:  absolute;width:  300px;right: 401px;top: 100px;height: auto;">
-            后台预警程序每日凌晨五点自动发送邮件...
-        </a>
-    </div>
+    <a style="color: rgba(19,33,212,0.89);display:  inline-block;position:  absolute;width:  300px;right: 401px;top: 100px;height: auto;">
+        后台预警程序每日凌晨五点自动发送邮件...
+    </a>
 </div>
 
 <div id="view_statistics_data" style="position:  relative;">
-    <div>
-        <a class="url" href="http://localhost:7100/monitor/alarm-statistics"
-           style="color: rgba(212,11,7,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 100px;height: auto;">
-            1.查看监测统计数据
-        </a>
-    </div>
+    <a href="javascript:void(0)" id="alarm-statistics"
+       style="color: rgba(212,11,7,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 100px;height: auto;">
+        1.查看监测统计数据
+    </a>
 </div>
 <div id="send_email_box" style="position:  relative;">
-    <div>
-        <a class="url" href="http://localhost:7100/monitor/send-email"
-           style="color: rgba(212,11,7,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 130px;height: auto;">
-            2.以邮件方式发送监测报告
-        </a>
-    </div>
+    <a href="javascript:void(0)" id="send-email"
+       style="color: rgba(212,11,7,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 130px;height: auto;">
+        2.以邮件方式发送监测报告
+    </a>
 </div>
 <div id="view_all_index" style="position:  relative;">
-    <div>
-        <a class="url" href="http://localhost:7100/monitor/get-all-indices"
-           style="color: rgba(212,11,7,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 160px;height: auto;">
-            3.查看集群所有索引列表
-        </a>
-    </div>
+    <a href="javascript:void(0)" id="get-all-indices"
+       style="color: rgba(212,11,7,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 160px;height: auto;">
+        3.查看集群所有索引列表
+    </a>
 </div>
 <div id="view_all_24h" style="position:  relative;">
-    <div>
-        <a class="url" href="http://localhost:7100/monitor/24h-statistics"
-           style="color: rgba(212,11,7,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 190px;height: auto;">
-            4.查看最近24小时各索引数据统计量
-        </a>
-    </div>
+    <a href="javascript:void(0)" id="24h-statistics"
+       style="color: rgba(212,11,7,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 190px;height: auto;">
+        4.查看最近24小时各索引数据统计量
+    </a>
 </div>
 <div id="view_all_7d" style="position:  relative;">
-    <div>
-        <a class="url" href="http://localhost:7100/monitor/7d-statistics"
-           style="color: rgba(212,11,7,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 220px;height: auto;">
-            5.查看最近一周各索引数据统计量
-        </a>
-    </div>
+    <a href="javascript:void(0)" id="7d-statistics"
+       style="color: rgba(212,11,7,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 220px;height: auto;">
+        5.查看最近一周各索引数据统计量
+    </a>
 </div>
 <div id="view_all_delete" style="position:  relative;">
-    <div>
-        <a class="url" href="http://localhost:7100/monitor/delete-statistics"
-           style="color: rgba(212,11,7,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 250px;height: auto;">
-            6.最近24小时集群删除程序运行情况
-        </a>
-    </div>
+    <a href="javascript:void(0)" id="delete-statistics"
+       style="color: rgba(212,11,7,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 250px;height: auto;">
+        6.最近24小时集群删除程序运行情况
+    </a>
 </div>
 <!--<div id="send_assign_email" style="position:  relative;">-->
-    <!--<div style="float: left;">-->
-        <!--<input type="text" name="search" id="A" placeholder="请输入关键字">-->
-        <!--<div id="send_assign_email_to">发送</div>-->
-    <!--</div>-->
+<!--<div style="float: left;">-->
+<!--<input type="text" name="search" id="A" placeholder="请输入关键字">-->
+<!--<div id="send_assign_email_to">发送</div>-->
 <!--</div>-->
-<script type='text/javascript' src='http://localhost:7477/knowledge-graph/path/js/jquery-2.2.4.min.js'></script>
-<script type='text/javascript' src="http://localhost:7477/knowledge-graph/path/js/d3.js" charset="utf-8"></script>
-<script type='text/javascript' src='http://localhost:7477/knowledge-graph/path/js/inter.js'></script>
-<script type='text/javascript' src='http://localhost:7477/knowledge-graph/path/js/update.js'></script>
-<script type='text/javascript' src='http://localhost:7477/knowledge-graph/path/js/graph.js'></script>
+<!--</div>-->
+<!-- JSON viewer -->
+
+<!--<div id="json-renderer"></div>-->
+
+<div id="json-renderer"
+     style="position: relative; color: rgba(15,1,3,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 280px;height: auto;">
+</div>
+
 <script>
+    // 1.查看监测统计数据
+    $('#alarm-statistics').click(function () {
+        retrieveDataToJsonOrPrint("alarm-statistics")
+    });
 
-    function input() {
-        $("#search").off("click").on("click", function () {
-            alert("Message");
-            $.ajax({
-                type: 'POST',
-                url: 'http://localhost:7100/monitor/alarm-statistics',
-                data: json,
-                contentType: "application/json",
-                success: function (data) {
-                    output(data);
-                },
-                dataType: 'string'
-            });
-            // $("#graphId").html("");
-            // var entityCutName = $("#A").val();
-            //
-            //
-            // if (entityCutName != null && entityCutName != "" && entityCutName != undefined) {
-            //
-            //     if (entityCutName.indexOf(" ") == -1) { // 没有空格
-            //
-            //         if (entityCutName.indexOf("？") == -1 && entityCutName.indexOf("?") == -1) {
-            //             var obj = new Object();
-            //             obj.name = entityCutName;
-            //             obj.sysTemUserId = ["234", "1", "316", "313", "322", "2", "287", "1", "13", "46", "277", "309", "4", "310", "379", "12", "2", "3", "8", "11", "4", "44", "1", "116", "22", "25", "287", "13", "34", "10", "93", "37", "111", "98", "285", "24", "17", "280", "321", "28"];
-            //             var json = JSON.stringify(obj);
-            //
-            //             alert("search for " + entityCutName + "?");
-            //             $.ajax({
-            //                 type: 'POST',
-            //                 url: 'http://localhost:7477/knowledge-graph/hello/dataSource',
-            //                 data: json,
-            //                 contentType: "application/json",
-            //                 success: function (data) {
-            //                     output(data);
-            //                 },
-            //                 dataType: 'json'
-            //             });
-            //         } else {
-            //
-            //             if (entityCutName.indexOf("人民的名义") == -1) {
-            //                 var obj = new Object();
-            //                 obj.askString = entityCutName;
-            //                 obj.sysTemUserId = ["234", "1", "316", "313", "322", "2", "287", "1", "13", "46", "277", "309", "4", "310", "379", "12", "2", "3", "8", "11", "4", "44", "1", "116", "22", "25", "287", "13", "34", "10", "93", "37", "111", "98", "285", "24", "17", "280", "321", "28"];
-            //                 var json = JSON.stringify(obj);
-            //
-            //                 alert("search for " + entityCutName + "?");
-            //                 $.ajax({
-            //                     type: 'POST',
-            //                     url: 'http://localhost:7477/knowledge-graph/hello/dataSource/answer',
-            //                     data: json,
-            //                     contentType: "application/json",
-            //                     success: function (data) {
-            //                         output(data);
-            //                     },
-            //                     dataType: 'json'
-            //                 });
-            //             } else {    //  人名的名义知识图谱数据
-            //                 d3.json("http://localhost:7477/knowledge-graph/hello/dataSource/type/2", function (error, json) { // 服务器加载知识图谱数据
-            //                     if (error) {
-            //                         return console.warn(error);
-            //                     }
-            //                     console.log("人名的名义知识图谱数据：");
-            //                     console.log(json.nodes);
-            //                     console.log(json.links);
-            //                     output(json);
-            //                 });
-            //             }
-            //         }
-            //
-            //
-            //     } else {    // 有空格   覃永 吴良
-            //         debugger
-            //         var arr = entityCutName.split(" ");
-            //
-            //         var obj = {};
-            //         obj.nameArray = arr;
-            //         obj.sysTemUserId = ["234", "1", "316", "313", "322", "2", "287", "1", "13", "46", "277", "309", "4", "310", "379", "12", "2", "3", "8", "11", "4", "44", "1", "116", "22", "25", "287", "13", "34", "10", "93", "37", "111", "98", "285", "24", "17", "280", "321", "28"];
-            //         var json = JSON.stringify(obj);
-            //
-            //         alert("search for " + entityCutName + "?");
-            //         $.ajax({
-            //             type: 'POST',
-            //             url: 'http://localhost:7477/knowledge-graph/hello/dataSource/RealSearch',
-            //             data: json,
-            //             contentType: "application/json",
-            //             success: function (data) {
-            //                 output(data);
-            //             },
-            //             dataType: 'json'
-            //         });
-            //     }
-            // } else {
-            //     alert("keyword not null!")
-            // }
-        })
+    // 2.以邮件方式发送监测报告
+    $('#send-email').click(function () {
+        retrieveDataToJsonOrPrint("send-email")
+    });
 
+    // 3.查看集群所有索引列表
+    $('#get-all-indices').click(function () {
+        retrieveDataToJsonOrPrint("get-all-indices")
+    });
+
+    // 4.查看最近24小时各索引数据统计量
+    $('#24h-statistics').click(function () {
+        retrieveDataToJsonOrPrint("24h-statistics")
+    });
+
+    // 5.查看最近一周各索引数据统计量
+    $('#7d-statistics').click(function () {
+        retrieveDataToJsonOrPrint("7d-statistics")
+    });
+
+    // 6.最近24小时集群删除程序运行情况
+    $('#delete-statistics').click(function () {
+        retrieveDataToJsonOrPrint("delete-statistics")
+    });
+
+    // 从GET接口获取数据并以JSON的方式呈现到页面
+    function retrieveDataToJsonOrPrint(interfaceUrl) {
+        alert("Please wait for a moment...");
+        $("#loading").show();
+        d3.json(interfaceUrl, function (error, json) {
+            if (error) {
+                return console.warn(error);
+            }
+            $("#loading").hide();
+            console.log(json);
+            $('#json-renderer').jsonViewer(json, {collapsed: false, withQuotes: true});
+        });
     }
 
-    function output(data) {
-        console.log(data);
-        alert(data);
-        // loadZdrSearchGraph(data);
-    }
-
+    // WHOLE PAGE LOADING
+    $("#loading").fadeOut(400);
 </script>
 </body>
 </html>
+
 

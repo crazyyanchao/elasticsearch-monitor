@@ -209,7 +209,6 @@ public class ElasticStatistics {
                 md5Task.put(md5, taskObj);
             }
         }
-        md5Task.put("_delete_query_execute_count", md5Task.size());
         return md5Task;
     }
 
