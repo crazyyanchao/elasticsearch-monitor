@@ -1,7 +1,7 @@
 server:
   port: 7200
   servlet:
-    context-path: /monitor
+    context-path: /es-monitor
   compression:
     enabled: true
     min-response-size: 1024

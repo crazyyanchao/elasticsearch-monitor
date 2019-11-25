@@ -58,7 +58,6 @@ public class ElasticStatistics {
     private EsIndexSearch esIndexSearch;
 
     public ElasticStatistics() {
-        HttpProxyRegister.register(SysConstant.ELASTICSEARCH_ADDRESS);
     }
 
     /**

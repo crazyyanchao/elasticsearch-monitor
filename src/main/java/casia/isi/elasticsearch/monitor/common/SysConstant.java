@@ -38,7 +38,7 @@ public class SysConstant {
     public static final int HTTP_PORT = Integer.parseInt(loadProperty("server.http.port"));
 //    public static final int HTTPS_PORT = Integer.parseInt(loadProperty("server.https.port"));
 
-    public static final String ELASTICSEARCH_ADDRESS = loadProperty("elasticsearch.address");
+    public static String ELASTICSEARCH_ADDRESS = loadProperty("elasticsearch.address");
     public static final String MONITOR_INDEX_TYPE = loadProperty("monitor.index.type");
     public static final String ALARM_STATUS_TIME = loadProperty("alarm.status.time");
     public static final String EMAIL_RECEIVER = loadProperty("email.receiver");
