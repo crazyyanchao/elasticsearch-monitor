@@ -82,13 +82,13 @@
                 alert('Please input your address!');
             } else {
                 alert("Login successfully!");
-                writeAddressToPro(address);
+                removeLastHttpsAddNewAddress(address);
                 window.open("index");
             }
         });
     }
 
-    function writeAddressToPro(address) {
+    function removeLastHttpsAddNewAddress(address) {
         postInterface(address);
     }
 
@@ -98,7 +98,7 @@
         var json = JSON.stringify(obj);
         $.ajax({
             type: 'POST',
-            url: 'writeAddressToPro',
+            url: 'removeLastHttpsAddNewAddress',
             data: json,
             contentType: "application/json",
             success: function (data) {

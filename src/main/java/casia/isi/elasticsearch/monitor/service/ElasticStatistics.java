@@ -28,6 +28,7 @@ import casia.isi.elasticsearch.common.RangeOccurs;
 import casia.isi.elasticsearch.common.SortOrder;
 import casia.isi.elasticsearch.monitor.common.EsUrl;
 import casia.isi.elasticsearch.monitor.common.SysConstant;
+import casia.isi.elasticsearch.operation.http.HttpDiscoverRegister;
 import casia.isi.elasticsearch.operation.http.HttpPoolSym;
 import casia.isi.elasticsearch.operation.http.HttpProxyRegister;
 import casia.isi.elasticsearch.operation.http.HttpProxyRequest;
@@ -211,6 +212,18 @@ public class ElasticStatistics {
         return md5Task;
     }
 
+    /**
+     * @param
+     * @return
+     * @Description: TODO(重置HTTP模块 - 将上一次注册的地址移除 ， 并加入新的集群地址)
+     */
+    public void removeLastHttpsAddNewAddress(String ipPorts) {
+        boolean status;
+        do {
+            status = HttpDiscoverRegister.discover(ipPorts);
+        } while (!status);
+    }
+
     public String getReportText() {
         JSONObject deleterObj = detectDeleter();
         JSONObject statisticsObj = statisticsToAlarm();
@@ -221,6 +234,7 @@ public class ElasticStatistics {
                 .append("❤集群所有索引数据量统计：" + statisticsObj.toJSONString() + "\r\n")
                 .toString();
     }
+
 }
 
 
