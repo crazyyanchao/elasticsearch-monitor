@@ -52,3 +52,10 @@ open http://localhost:9100/
 This will start a local webserver running on port 9100 serving elasticsearch-head
 ```
 
+## 五、插件图例
+![home](images/home.png)
+![casia](images/casia.png)
+![bigdesk](images/bigdesk.png)
+![cerebro](images/cerebro.png)
+![elasticsearch-head](images/elasticsearch-head.png)
+
