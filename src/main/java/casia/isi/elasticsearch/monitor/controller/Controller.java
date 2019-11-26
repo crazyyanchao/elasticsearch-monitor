@@ -35,6 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+
 /**
  * @author YanchaoMa yanchaoma@foxmail.com
  * @PACKAGE_NAME: casia.isi.elasticsearch.monitor.controller
@@ -81,7 +83,18 @@ public class Controller {
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String root(ModelMap modelMap) {
         modelMap.put("msg", "SpringBoot Elasticsearch Monitor Root");
-        return "root";
+        return "home";
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(README) http://localhost:7100/es-monitor/readme
+     */
+    @RequestMapping(value = "/readme", method = RequestMethod.GET)
+    public String readme(ModelMap modelMap) {
+        modelMap.put("msg", "SpringBoot Elasticsearch Monitor Readme");
+        return "readme";
     }
 
     /**
@@ -92,7 +105,7 @@ public class Controller {
     @RequestMapping(value = "/bigdesk-index", method = RequestMethod.GET)
     public String bigdeskIndex(ModelMap modelMap) {
         modelMap.put("msg", "SpringBoot Elasticsearch Monitor Bigdesk Index");
-        return "bigdesk/index";
+        return "bigdesk" + File.separator + "index";
     }
 
     /**

@@ -28,9 +28,9 @@
             <div class="icon">
                 <img alt="" src="path/images/login/user_icon_copy.png">
             </div>
-            <input id="es-address" name="login" placeholder="example:localhost:9200" maxlength="30" type="text"
+            <input id="es-address" name="login" placeholder="eg.http://localhost:9200" maxlength="30" type="text"
                    autocomplete="off"
-                   value="localhost:9200">
+                   value="http://localhost:9200">
             <div class="validation">
                 <img alt="" src="path/images/login/tick.png">
             </div>
@@ -83,7 +83,8 @@
             } else {
                 alert("Login successfully!");
                 removeLastHttpsAddNewAddress(address);
-                window.open("index");
+                // window.open("index");
+                window.location.href="index";
             }
         });
     }

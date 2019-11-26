@@ -27,6 +27,7 @@
 
 ## 四、集成开源插件
 >除了bigdesk以外其它插件都需要下载之后以服务方式启动然后在统一管理界面访问使用http://localhost:7100/es-monitor/
+>在对应模块使用相应插件需要单独输入URL地址
 1、bigdesk
 ```shell
 [http://localhost:7100/es-monitor/bigdesk-index]
