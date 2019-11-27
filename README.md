@@ -59,3 +59,4 @@ This will start a local webserver running on port 9100 serving elasticsearch-hea
 ![cerebro](images/cerebro.png)
 ![elasticsearch-head](images/elasticsearch-head.png)
 
+
