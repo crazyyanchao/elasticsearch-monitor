@@ -4,12 +4,12 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-    <title>CASIA ELASTICSEARCH MONITOR</title>
+    <title>Personal toolkit</title>
 
     <link rel="stylesheet" type="text/css" href="path/css/home/swiper.min.css">
 
     <link rel="stylesheet" type="text/css" href="path/css/home/style.css">
-    <link rel="icon" href="path/images/bigdesk/favicon.png" type="image/png">
+    <link rel="icon" href="path/images/root.png" type="image/png">
 </head>
 <!--<body style="">-->
 <body style="background: url(path/images/bg.jpg);">
@@ -55,7 +55,7 @@
                     <div class="col-sm-4 swiper-slide" data-swiper-slide-index="0" style="width: 400px;">
                         <div class="solution-card">
                             <img src="path/images/home/a1.png" width="100%">
-                            <h3>CASIA MONITOR</h3>
+                            <h3>ELASTICSEARCH MONITOR</h3>
                             <p>【配置定时报警任务】 【发送邮件/生成报告】
                                 【可全部监控或者定制化监控】【基本信息巡查】
                                 【集群深度运维】【非常用接口查询】</p>
@@ -100,7 +100,9 @@
                             <h3>elasticsearch-head</h3>
                             <p>Services need to be installed separately!
                                 A web front end for an Elasticsearch cluster.
-                                [https://github.com/mobz/elasticsearch-head]</p>
+                                [https://github.com/mobz/elasticsearch-head]
+                                ES集群状态查看、索引数据查看、ES DSL实现（增、删、改、查）操作，比较实用的地方：json串的格式化。
+                            </p>
                             <span>
                                 <input type="text" name="" class="elasticsearch-head-text"
                                        placeholder="http://localhost:9100/"
@@ -147,6 +149,109 @@
                         </div>
                     </div>
 
+                    <div class="col-sm-4 swiper-slide" data-swiper-slide-index="6" style="width: 400px;">
+                        <div class="solution-card">
+                            <img src="path/images/home/kibana.jpg" width="100%">
+                            <h3>Kibana</h3>
+                            <p>除了支持各种数据的可视化之外，最重要的是：支持Dev Tool进行RESTFUL API增删改查操作。
+                                ——比Postman工具和curl都方便很多。[https://github.com/elastic/kibana]
+                            </p>
+                            <span>
+                                <input type="text" name="" class="kibana-text"
+                                       placeholder="http://localhost:5601"
+                                       value="http://localhost:5601">
+                                <button id="kibana-button">跳转</button>
+</span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 swiper-slide" data-swiper-slide-index="7" style="width: 400px;">
+                        <div class="solution-card">
+                            <img src="path/images/home/elasticsearch.jpg" width="100%">
+                            <h3>Elasticsearch</h3>
+                            <p>更多elasticsearch工具。
+                            </p>
+                            <span><a href="https://discuss.elastic.co/"><span class="arrow-more">了解详情</span><span
+                                    class="arrow-f"></span></a>
+</span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 swiper-slide" data-swiper-slide-index="9" style="width: 400px;">
+                        <div class="solution-card">
+                            <img src="path/images/home/neo4j.jpg" width="100%">
+                            <h3>Neo4j</h3>
+                            <p>Neo4j社区。
+                            </p>
+                            <span><a href="https://community.neo4j.com/"><span class="arrow-more">了解详情</span><span
+                                    class="arrow-f"></span></a>
+</span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 swiper-slide" data-swiper-slide-index="10" style="width: 400px;">
+                        <div class="solution-card">
+                            <img src="path/images/home/neo4j.jpg" width="100%">
+                            <h3>Neo4j</h3>
+                            <p>Neo4j中文社区。
+                            </p>
+                            <span><a href="http://neo4j.com.cn/"><span class="arrow-more">了解详情</span><span
+                                    class="arrow-f"></span></a>
+</span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 swiper-slide" data-swiper-slide-index="11" style="width: 400px;">
+                        <div class="solution-card">
+                            <img src="path/images/home/neo4j.jpg" width="100%">
+                            <h3>Neo4j</h3>
+                            <p>Neo4j官网。
+                            </p>
+                            <span><a href="https://neo4j.com/"><span class="arrow-more">了解详情</span><span
+                                    class="arrow-f"></span></a>
+</span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 swiper-slide" data-swiper-slide-index="12" style="width: 400px;">
+                        <div class="solution-card">
+                            <img src="path/images/home/neo4j2.jpg" width="100%">
+                            <h3>NEO4J MONITOR</h3>
+                            <p>neo4j集群监控工具。
+                            </p>
+                            <span><a href="javascript:void(0)" id="neo4j-button"><span class="arrow-more">访问索引监测运维系统</span><span
+                                    class="arrow-f"></span></a>
+</span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 swiper-slide" data-swiper-slide-index="13" style="width: 400px;">
+                        <div class="solution-card">
+                            <img src="path/images/home/neo4j.jpg" width="100%">
+                            <h3>Neo4j</h3>
+                            <p>更多neo4j工具。
+                            </p>
+                            <span><a href="https://community.neo4j.com/"><span class="arrow-more">了解详情</span><span
+                                    class="arrow-f"></span></a>
+</span>
+                        </div>
+                    </div>
+
+                    <!--<div class="col-sm-4 swiper-slide" data-swiper-slide-index="8" style="width: 400px;">-->
+                    <!--<div class="solution-card">-->
+                    <!--<img src="path/images/home/ElasticHQ.png" width="100%">-->
+                    <!--<h3>ElasticHQ</h3>-->
+                    <!--<p>管理elasticsearch集群以及通过web界面来进行查询操作。[https://github.com/royrusso/elasticsearch-HQ]-->
+                    <!--</p>-->
+                    <!--<span>-->
+                    <!--<input type="text" name="" class="ElasticHQ-text"-->
+                    <!--placeholder="http://localhost:5000"-->
+                    <!--value="http://localhost:5000">-->
+                    <!--<button id="ElasticHQ-button">跳转</button>-->
+                    <!--</span>-->
+                    <!--</div>-->
+                    <!--</div>-->
+
                 </div>
                 <div class="swiper-pagination solution-pagination swiper-pagination-clickable swiper-pagination-bullets">
                     <span class="swiper-pagination-bullet" tabindex="0" role="button" aria-label="Go to slide 1"></span><span
@@ -182,6 +287,28 @@
             var text = $(this).prev('.elasticsearch-head-text').val();
             console.log(text);
             window.location.href = text;
+        });
+
+        $('#kibana-button').on("click", function () {
+            var text = $(this).prev('.kibana-text').val();
+            console.log(text);
+            window.location.href = text;
+        });
+
+        $('#ElasticHD-button').on("click", function () {
+            var text = $(this).prev('.ElasticHD-text').val();
+            console.log(text);
+            window.location.href = text;
+        });
+
+        $('#ElasticHQ-button').on("click", function () {
+            var text = $(this).prev('.ElasticHQ-text').val();
+            console.log(text);
+            window.location.href = text;
+        });
+
+        $('#neo4j-button').on("click", function () {
+            alert("Coming soon!");
         });
 
         new Swiper(".swiper-container", {

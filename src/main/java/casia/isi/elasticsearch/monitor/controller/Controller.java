@@ -23,19 +23,31 @@ package casia.isi.elasticsearch.monitor.controller;
  * 　　　　　　　　　 ┗┻┛　 ┗┻┛+ + + +
  */
 
+import casia.isi.elasticsearch.common.EsAccessor;
 import casia.isi.elasticsearch.monitor.entity.UserJson;
 import casia.isi.elasticsearch.monitor.service.ElasticStatistics;
 import casia.isi.elasticsearch.monitor.common.Message;
 import casia.isi.elasticsearch.monitor.common.SysConstant;
 import casia.isi.elasticsearch.monitor.entity.MailBean;
 import casia.isi.elasticsearch.monitor.service.MailService;
+import casia.isi.elasticsearch.operation.http.HttpPoolSym;
+import casia.isi.elasticsearch.operation.http.HttpProxyRegister;
+import casia.isi.elasticsearch.operation.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.frameworkset.spi.remote.http.ClientConfiguration;
+import org.frameworkset.spi.remote.http.HttpRequestUtil;
+import org.frameworkset.spi.remote.http.proxy.HealthCheck;
+import org.frameworkset.spi.remote.http.proxy.HttpAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author YanchaoMa yanchaoma@foxmail.com
@@ -56,7 +68,7 @@ public class Controller {
     /**
      * @param
      * @return
-     * @Description: TODO(Monitor Instrument Index) http://localhost:7100/es-monitor/index
+     * @Description: TODO(Monitor Instrument Index) http://localhost:7100/toolkit/index
      */
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public String index(ModelMap modelMap) {
@@ -67,7 +79,7 @@ public class Controller {
     /**
      * @param
      * @return
-     * @Description: TODO(Monitor Instrument Index) http://localhost:7100/es-monitor/login
+     * @Description: TODO(Monitor Instrument Index) http://localhost:7100/toolkit/login
      */
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login(ModelMap modelMap) {
@@ -78,7 +90,7 @@ public class Controller {
     /**
      * @param
      * @return
-     * @Description: TODO(Monitor Instrument Index) http://localhost:7100/es-monitor/
+     * @Description: TODO(Monitor Instrument Index) http://localhost:7100/toolkit/
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String root(ModelMap modelMap) {
@@ -89,7 +101,7 @@ public class Controller {
     /**
      * @param
      * @return
-     * @Description: TODO(README) http://localhost:7100/es-monitor/readme
+     * @Description: TODO(README) http://localhost:7100/toolkit/readme
      */
     @RequestMapping(value = "/readme", method = RequestMethod.GET)
     public String readme(ModelMap modelMap) {
@@ -100,7 +112,7 @@ public class Controller {
     /**
      * @param
      * @return
-     * @Description: TODO(Monitor Instrument Bigdesk Index) http://localhost:7100/es-monitor/bigdesk-index
+     * @Description: TODO(Monitor Instrument Bigdesk Index) http://localhost:7100/toolkit/bigdesk-index
      */
     @RequestMapping(value = "/bigdesk-index", method = RequestMethod.GET)
     public String bigdeskIndex(ModelMap modelMap) {
@@ -111,12 +123,41 @@ public class Controller {
     /**
      * @param
      * @return
-     * @Description: TODO(将集群地址赋值给动态常量)
+     * @Description: TODO(集群地址健康检查)
+     */
+    @RequestMapping(value = "/healthCheck", method = RequestMethod.POST)
+    @ResponseBody
+    public String healthCheck(@RequestBody UserJson userJson) {
+        String address = userJson.getAddress();
+
+        // 先重置集群地址
+        new EsAccessor() {
+            @Override
+            public void removeLastHttpsAddNewAddress(String ipPorts) {
+                super.removeLastHttpsAddNewAddress(ipPorts);
+            }
+        }.removeLastHttpsAddNewAddress(userJson.getAddress());
+
+        HttpRequest httpRequest = new HttpRequest();
+        boolean status = httpRequest.checkHttpGet(address);
+        return new Message().setStatus(status).toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(重置集群地址 - 将集群地址赋值给动态常量)
      */
     @RequestMapping(value = "/removeLastHttpsAddNewAddress", method = RequestMethod.POST)
     @ResponseBody
     public String removeLastHttpsAddNewAddress(@RequestBody UserJson userJson) {
-        elasticStatistics.removeLastHttpsAddNewAddress(userJson.getAddress());
+        new EsAccessor() {
+            @Override
+            public void removeLastHttpsAddNewAddress(String ipPorts) {
+                super.removeLastHttpsAddNewAddress(ipPorts);
+            }
+        }.removeLastHttpsAddNewAddress(userJson.getAddress());
+
         return JSONObject.parseObject(JSON.toJSONString(userJson)).toJSONString();
     }
 
@@ -125,21 +166,19 @@ public class Controller {
      * @return
      * @Description: TODO(SEND EMAIL)
      */
-    @RequestMapping(value = "/send-email", method = RequestMethod.GET)
+    @RequestMapping(value = "/send-email", method = RequestMethod.POST)
     @ResponseBody
-    public String sendEmail(ModelMap modelMap) {
-        modelMap.put("msg", "Send Email");
-
+    public String sendEmail(@RequestBody UserJson userJson) {
         MailBean mailBean = new MailBean();
         mailBean.setReceiver(SysConstant.EMAIL_RECEIVER);
-        mailBean.setContent(elasticStatistics.getReportText());
+        mailBean.setContent(elasticStatistics.getReportText(userJson.getAddress()));
         mailBean.setSubject("[Daily Report]-CASIA AliYun Elasticsearch Monitor");
         try {
             mailService.sendSimpleMail(mailBean);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new Message().send(true).toJSONString();
+        return new Message().setStatus(true).toJSONString();
     }
 
     /**
@@ -147,12 +186,11 @@ public class Controller {
      * @return
      * @Description: TODO(ALARM STATISTICS)
      */
-    @RequestMapping(value = "/alarm-statistics", method = RequestMethod.GET)
+    @RequestMapping(value = "/alarm-statistics", method = RequestMethod.POST)
     @ResponseBody
-    public String alarmStatistics(ModelMap modelMap) {
-        modelMap.put("msg", "Alarm Statistics");
-        return new Message().send(true)
-                .putResult(elasticStatistics.getReportText())
+    public String alarmStatistics(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.getReportText(userJson.getAddress()))
                 .toJSONString();
     }
 
@@ -161,12 +199,11 @@ public class Controller {
      * @return
      * @Description: TODO(GET ALL INDICES)
      */
-    @RequestMapping(value = "/get-all-indices", method = RequestMethod.GET)
+    @RequestMapping(value = "/get-all-indices", method = RequestMethod.POST)
     @ResponseBody
-    public String getAllIndices(ModelMap modelMap) {
-        modelMap.put("msg", "Get all indices");
-        return new Message().send(true)
-                .putResult(elasticStatistics.getAllIndices())
+    public String getAllIndices(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.getAllIndices(userJson.getAddress()))
                 .toJSONString();
     }
 
@@ -175,12 +212,11 @@ public class Controller {
      * @return
      * @Description: TODO(24H STATISTICS)
      */
-    @RequestMapping(value = "/24h-statistics", method = RequestMethod.GET)
+    @RequestMapping(value = "/24h-statistics", method = RequestMethod.POST)
     @ResponseBody
-    public String get24HStatistics(ModelMap modelMap) {
-        modelMap.put("msg", "Get all indices");
-        return new Message().send(true)
-                .putResult(elasticStatistics.recentOneDaysIndexStatus())
+    public String get24HStatistics(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.recentOneDaysIndexStatus(userJson.getAddress()))
                 .toJSONString();
     }
 
@@ -189,12 +225,11 @@ public class Controller {
      * @return
      * @Description: TODO(7D STATISTICS)
      */
-    @RequestMapping(value = "/7d-statistics", method = RequestMethod.GET)
+    @RequestMapping(value = "/7d-statistics", method = RequestMethod.POST)
     @ResponseBody
-    public String get7DStatistics(ModelMap modelMap) {
-        modelMap.put("msg", "Get all indices");
-        return new Message().send(true)
-                .putResult(elasticStatistics.recentSeveralDaysIndexStatus())
+    public String get7DStatistics(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.recentSeveralDaysIndexStatus(userJson.getAddress()))
                 .toJSONString();
     }
 
@@ -203,12 +238,11 @@ public class Controller {
      * @return
      * @Description: TODO(DELETE STATISTICS)
      */
-    @RequestMapping(value = "/delete-statistics", method = RequestMethod.GET)
+    @RequestMapping(value = "/delete-statistics", method = RequestMethod.POST)
     @ResponseBody
-    public String getDeleteStatistics(ModelMap modelMap) {
-        modelMap.put("msg", "Get all indices");
-        return new Message().send(true)
-                .putResult(elasticStatistics.detectDeleter())
+    public String getDeleteStatistics(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.detectDeleter(userJson.getAddress()))
                 .toJSONString();
     }
 }

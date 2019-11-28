@@ -125,7 +125,7 @@ public class ScheduledTask {
         mailBean.setReceiver(SysConstant.EMAIL_RECEIVER);
         mailBean.setSubject("[Daily Report]-CASIA AliYun Elasticsearch Monitor");
 
-        mailBean.setContent(elastic.getReportText());
+        mailBean.setContent(elastic.getReportText(SysConstant.ELASTICSEARCH_ADDRESS)); // 后台定时任务监控预警配置的集群
 
         try {
             mailService.sendSimpleMail(mailBean);
@@ -179,7 +179,7 @@ public class ScheduledTask {
 
     private List<JSONObject> backstageTaskData() {
         List<JSONObject> dataList = new ArrayList<>();
-        String response = esIndexCreat.httpRequest.httpGet(EsUrl._tasks.url());
+        String response = esIndexCreat.request.httpGet(EsUrl._tasks.url());
         JSONObject result = JSONObject.parseObject(response);
 
         if (result != null && !result.isEmpty()) {

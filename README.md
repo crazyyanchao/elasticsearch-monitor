@@ -15,7 +15,7 @@
 5、24小时索引无新数据马上报警
 
 ## 三、WEB仪表盘
->[http://localhost:7100/es-monitor/]
+>[http://localhost:7100/toolkit/]
 1、登录界面处输入地址后续操作则直接使用这个地址
 2、在配置文件配置地址后续访问非登录界面则直接使用这个地址
 
@@ -26,11 +26,11 @@
   【每5S执行一次TASK RECORD，定期删除过时的TASK】【.monitor.task.index.retain.time选项进行配置】
 
 ## 四、集成开源插件
->除了bigdesk以外其它插件都需要下载之后以服务方式启动然后在统一管理界面访问使用http://localhost:7100/es-monitor/
+>除了bigdesk以外其它插件都需要下载之后以服务方式启动然后在统一管理界面访问使用http://localhost:7100/toolkit/
 >在对应模块使用相应插件需要单独输入URL地址
 1、bigdesk
 ```shell
-[http://localhost:7100/es-monitor/bigdesk-index]
+[http://localhost:7100/toolkit/bigdesk-index]
 ```
 
 2、cerebro - 

@@ -36,8 +36,8 @@ public class Message {
 
     private JSONObject object = new JSONObject();
 
-    public Message send(boolean bool) {
-        this.object.put("status", true);
+    public Message setStatus(boolean bool) {
+        this.object.put("status", bool);
         return this;
     }
 

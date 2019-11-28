@@ -23,14 +23,13 @@ package casia.isi.elasticsearch.monitor.service;
  * 　　　　　　　　　 ┗┻┛　 ┗┻┛+ + + +
  */
 
+import casia.isi.elasticsearch.common.EsAccessor;
 import casia.isi.elasticsearch.common.FieldOccurs;
 import casia.isi.elasticsearch.common.RangeOccurs;
 import casia.isi.elasticsearch.common.SortOrder;
 import casia.isi.elasticsearch.monitor.common.EsUrl;
 import casia.isi.elasticsearch.monitor.common.SysConstant;
-import casia.isi.elasticsearch.operation.http.HttpDiscoverRegister;
 import casia.isi.elasticsearch.operation.http.HttpPoolSym;
-import casia.isi.elasticsearch.operation.http.HttpProxyRegister;
 import casia.isi.elasticsearch.operation.http.HttpProxyRequest;
 import casia.isi.elasticsearch.operation.search.EsIndexSearch;
 import casia.isi.elasticsearch.util.ClientUtils;
@@ -76,10 +75,10 @@ public class ElasticStatistics {
      * @return
      * @Description: TODO(最近七天的索引数据量统计)
      */
-    public JSONArray recentSeveralDaysIndexStatus() {
+    public JSONArray recentSeveralDaysIndexStatus(String address) {
         String stopTime = DateUtil.millToTimeStr(System.currentTimeMillis());
         String startTime = DateUtil.dateSub(stopTime, 7 * 86_400_000); // 7*24H
-        return daysIndexStatus(startTime, stopTime);
+        return daysIndexStatus(address, startTime, stopTime);
     }
 
     private JSONObject packStatistics(String indexName, String indexType, String date, int count) {
@@ -91,13 +90,22 @@ public class ElasticStatistics {
         return object;
     }
 
-    public JSONArray daysIndexStatus(String startTime, String stopTime) {
+    public JSONArray daysIndexStatus(String address, String startTime, String stopTime) {
+
+        // 重置HTTP模块 - 将上一次注册的地址移除 ， 并加入新的集群地址
+        new EsAccessor() {
+            @Override
+            public void removeLastHttpsAddNewAddress(String ipPorts) {
+                super.removeLastHttpsAddNewAddress(ipPorts);
+            }
+        }.removeLastHttpsAddNewAddress(address);
+
         JSONArray array = new JSONArray();
-        JSONObject mapping = getAllIndices();
+        JSONObject mapping = getAllIndices(address);
         for (Map.Entry entry : mapping.entrySet()) {
             String indexName = String.valueOf(entry.getKey());
             String indexType = String.valueOf(entry.getValue());
-            esIndexSearch = new EsIndexSearch(SysConstant.ELASTICSEARCH_ADDRESS, indexName, indexType);
+            esIndexSearch = new EsIndexSearch(address, indexName, indexType);
 
             esIndexSearch.addRangeTerms(SysConstant.ELASTICSEARCH_TIME_FIELD, startTime, stopTime);
             List<String[]> result = esIndexSearch.facetDate(SysConstant.ELASTICSEARCH_TIME_FIELD, "yyyy-MM-dd", "1d");
@@ -120,10 +128,10 @@ public class ElasticStatistics {
      * @return
      * @Description: TODO(最近一天的索引数据量统计)
      */
-    public JSONArray recentOneDaysIndexStatus() {
+    public JSONArray recentOneDaysIndexStatus(String address) {
         String stopTime = DateUtil.millToTimeStr(System.currentTimeMillis());
         String startTime = DateUtil.dateSub(stopTime, 86_400_000); // 24H
-        return daysIndexStatus(startTime, stopTime);
+        return daysIndexStatus(address, startTime, stopTime);
     }
 
     /**
@@ -131,7 +139,15 @@ public class ElasticStatistics {
      * @return
      * @Description: TODO(所有索引 - 索引类型和索引名)
      */
-    public JSONObject getAllIndices() {
+    public JSONObject getAllIndices(String address) {
+        // 先重置集群地址
+        new EsAccessor() {
+            @Override
+            public void removeLastHttpsAddNewAddress(String ipPorts) {
+                super.removeLastHttpsAddNewAddress(ipPorts);
+            }
+        }.removeLastHttpsAddNewAddress(address);
+
         String queryResult = request.httpGet(ClientUtils.referenceUrl(EsUrl._mapping.url()));
         JSONObject object = JSONObject.parseObject(queryResult);
         JSONObject mapping = new JSONObject();
@@ -143,12 +159,12 @@ public class ElasticStatistics {
         return mapping;
     }
 
-    public JSONObject statisticsToAlarm() {
+    public JSONObject statisticsToAlarm(String address) {
         // 最近七天的数据量
-        JSONArray severalDays = recentSeveralDaysIndexStatus();
+        JSONArray severalDays = recentSeveralDaysIndexStatus(address);
 
         // 最近24小时的数据量
-        JSONArray oneDay = recentOneDaysIndexStatus();
+        JSONArray oneDay = recentOneDaysIndexStatus(address);
 
         JSONObject statistics = new JSONObject();
         statistics.put("SEVERAL_DAYS_STATISTICS", severalDays);
@@ -172,8 +188,12 @@ public class ElasticStatistics {
      * @return
      * @Description: TODO(删除任务的执行状态)
      */
-    public JSONObject detectDeleter() {
-        esIndexSearch = new EsIndexSearch(SysConstant.ELASTICSEARCH_ADDRESS, ".tasks", "task");
+    public JSONObject detectDeleter(String address) {
+
+        esIndexSearch = new EsIndexSearch(address, ".tasks", "task");
+
+        // 重置HTTP模块 - 将上一次注册的地址移除 ， 并加入新的集群地址
+        esIndexSearch.removeLastHttpsAddNewAddress(address); // 重置集群HTTP池
 
         // 获取最近24H的任务
         long millTime = System.currentTimeMillis() - 86_400_000L;
@@ -212,23 +232,11 @@ public class ElasticStatistics {
         return md5Task;
     }
 
-    /**
-     * @param
-     * @return
-     * @Description: TODO(重置HTTP模块 - 将上一次注册的地址移除 ， 并加入新的集群地址)
-     */
-    public void removeLastHttpsAddNewAddress(String ipPorts) {
-        boolean status;
-        do {
-            status = HttpDiscoverRegister.discover(ipPorts);
-        } while (!status);
-    }
-
-    public String getReportText() {
-        JSONObject deleterObj = detectDeleter();
-        JSONObject statisticsObj = statisticsToAlarm();
+    public String getReportText(String address) {
+        JSONObject deleterObj = detectDeleter(address);
+        JSONObject statisticsObj = statisticsToAlarm(address);
         return new StringBuilder()
-                .append("❤集群索引数量：" + getAllIndices().size() + "\r\n")
+                .append("❤集群索引数量：" + getAllIndices(address).size() + "\r\n")
                 .append("❤24H运行的数据删除任务数量：" + deleterObj.size() + "\r\n")
                 .append("❤24H数据删除任务详细信息：" + deleterObj.toJSONString() + "\r\n")
                 .append("❤集群所有索引数据量统计：" + statisticsObj.toJSONString() + "\r\n")
