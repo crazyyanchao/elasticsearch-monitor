@@ -29,6 +29,7 @@ import casia.isi.elasticsearch.common.RangeOccurs;
 import casia.isi.elasticsearch.common.SortOrder;
 import casia.isi.elasticsearch.monitor.common.EsUrl;
 import casia.isi.elasticsearch.monitor.common.SysConstant;
+import casia.isi.elasticsearch.monitor.common.TaskAction;
 import casia.isi.elasticsearch.operation.http.HttpPoolSym;
 import casia.isi.elasticsearch.operation.http.HttpProxyRequest;
 import casia.isi.elasticsearch.operation.search.EsIndexSearch;
@@ -40,6 +41,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -201,11 +203,87 @@ public class ElasticStatistics {
         esIndexSearch.addSortField("task.start_time_in_millis", SortOrder.ASC);
         esIndexSearch.setRow(10000);
         esIndexSearch.execute(new String[]{"task.description", "task.start_time_in_millis", "task.node", "task.id", "task.type",
-                "task.action", "task.running_time_in_nanos", "task.cancellable", "task.parent_task_id", "task.status", "response"});
+                "task.action", "task.running_time_in_nanos", "task.cancellable", "task.parent_task_id", "task.status", "response", "completed"});
         JSONObject result = esIndexSearch.queryJsonResult;
         JSONArray hits = result.getJSONObject("hits").getJSONArray("hits");
         esIndexSearch.reset();
-        return countDeleteQueryTask(hits);
+        JSONObject historyDeleteTasks = countDeleteQueryTask(hits);
+
+        // 获取正在运行的删除任务
+        JSONObject tasks = currentDeleteTask(address);
+
+        historyDeleteTasks.putAll(tasks);
+        return historyDeleteTasks;
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(获取正在运行的删除任务)
+     */
+    private JSONObject currentDeleteTask(String address) {
+        JSONObject result = clusterDeleteTask(address).getJSONObject("nodes");
+
+        JSONObject md5Task = new JSONObject();
+        for (Map.Entry entry : result.entrySet()) {
+            JSONObject object = (JSONObject) entry.getValue();
+            JSONObject tasks = object.getJSONObject("tasks");
+            for (Map.Entry entry1 : tasks.entrySet()) {
+                String currentTaskId = String.valueOf(entry1.getKey());
+                JSONObject taskObj = (JSONObject) entry1.getValue();
+
+                String action = taskObj.getString("action");
+                if (TaskAction._delete_by_query.getSymbol().contains(action)) {
+                    JSONObject taskDetail = getTaskDetailById(address, currentTaskId);
+                    taskObj.put("completed", taskDetail.getBooleanValue("taskDetail"));
+                    JSONObject task = taskDetail.getJSONObject("task");
+
+//                    String md5 = MD5Digest.MD5(task.getString("description"));
+                    taskObj.put("lastTaskId",currentTaskId);
+                    String md5 = task.getString("description");
+                    taskObj.putAll(task);
+                    if (md5Task.containsKey(md5)) {
+                        JSONObject taskCur = md5Task.getJSONObject(md5);
+                        taskObj.put("count", taskCur.getInteger("count") + 1);
+                        md5Task.put(md5, taskObj);
+                    } else {
+                        taskObj.put("count", 1);
+                        md5Task.put(md5, taskObj);
+                    }
+                }
+            }
+        }
+        return md5Task;
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(根据任务ID获取任务详情)
+     */
+    public JSONObject getTaskDetailById(String address, String taskId) {
+        // 重置HTTP模块 - 将上一次注册的地址移除 ， 并加入新的集群地址
+        esIndexSearch.removeLastHttpsAddNewAddress(address); // 重置集群HTTP池
+        HttpAccessor httpAccessor = new HttpAccessor();
+        String queryResult = httpAccessor.request.httpGet(EsUrl._tasks.url() + "/" + taskId);
+        return JSONObject.parseObject(queryResult);
+    }
+
+    private class HttpAccessor extends EsAccessor {
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(查看集群上正在运行的删除任务)
+     */
+    public JSONObject clusterDeleteTask(String address) {
+        // 重置HTTP模块 - 将上一次注册的地址移除 ， 并加入新的集群地址
+        esIndexSearch.removeLastHttpsAddNewAddress(address); // 重置集群HTTP池
+
+        HttpAccessor httpAccessor = new HttpAccessor();
+        String queryResult = httpAccessor.request.httpGet(EsUrl._tasks.url());
+        return JSONObject.parseObject(queryResult);
     }
 
     private JSONObject countDeleteQueryTask(JSONArray hits) {
@@ -216,8 +294,11 @@ public class ElasticStatistics {
             JSONObject taskObj = task.getJSONObject("_source").getJSONObject("task");
             JSONObject responseObj = task.getJSONObject("_source").getJSONObject("response");
             taskObj.put("response", responseObj);
-            String md5 = MD5Digest.MD5(taskObj.getString("description"));
-            taskObj.put("task_id", taskId);
+//            String md5 = MD5Digest.MD5(taskObj.getString("description"));
+            String md5 = taskObj.getString("description");
+
+            taskObj.put("lastTaskId",taskId);
+            taskObj.put("completed", task.getJSONObject("_source").getBooleanValue("completed"));
             // TRANSFER TIME
             taskObj.put("start_time", DateUtil.millToTimeStr(taskObj.getLongValue("start_time_in_millis")));
             if (md5Task.containsKey(md5)) {

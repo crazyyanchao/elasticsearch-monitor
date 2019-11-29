@@ -1,4 +1,4 @@
-package casia.isi.elasticsearch.monitor.entity;/**
+package casia.isi.elasticsearch.monitor.common;/**
  * 　　　　　　　 ┏┓       ┏┓+ +
  * 　　　　　　　┏┛┻━━━━━━━┛┻┓ + +
  * 　　　　　　　┃　　　　　　 ┃
@@ -24,29 +24,22 @@ package casia.isi.elasticsearch.monitor.entity;/**
 
 /**
  * @author YanchaoMa yanchaoma@foxmail.com
- * @PACKAGE_NAME: casia.isi.elasticsearch.monitor.entity
- * @Description: TODO(PARAMETER)
- * @date 2019/11/25 17:10
+ * @PACKAGE_NAME: casia.isi.elasticsearch.monitor.common
+ * @Description: TODO(Task action)
+ * @date 2019/11/29 10:51
  */
-public class UserJson {
+public enum TaskAction {
 
-    private String address;
+    _delete_by_query(" \"action\": \"indices:data/write/delete/byquery\"");
 
-    private String taskId;
+    private String symbol;
 
-    public String getAddress() {
-        return address;
+    TaskAction(String symbol) {
+        this.symbol = symbol;
     }
 
-    public String getTaskId() {
-        return taskId;
+    public String getSymbol() {
+        return symbol;
     }
 
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
 }

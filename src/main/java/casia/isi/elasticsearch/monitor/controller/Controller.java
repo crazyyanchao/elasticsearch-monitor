@@ -245,6 +245,32 @@ public class Controller {
                 .putResult(elasticStatistics.detectDeleter(userJson.getAddress()))
                 .toJSONString();
     }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(CLUSTER DELETE TASKS)
+     */
+    @RequestMapping(value = "/cluster-delete-task", method = RequestMethod.POST)
+    @ResponseBody
+    public String getClusterDeleteTask(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.clusterDeleteTask(userJson.getAddress()))
+                .toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(MONITOR DELETE TASK BY ID)
+     */
+    @RequestMapping(value = "/monitor-delete-task-id", method = RequestMethod.POST)
+    @ResponseBody
+    public String getMonitorDeleteTaskId(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.getTaskDetailById(userJson.getAddress(),userJson.getTaskId()))
+                .toJSONString();
+    }
 }
 
 
