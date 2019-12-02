@@ -9,22 +9,25 @@
     <link rel="stylesheet" href="path/css/bigdesk/reset.css">
 
     <!-- css grid -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
     <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" type="text/css" media="screen" href="path/css/bigdesk/CssGrid_2/ie.css" /><![endif]-->
+    <!--[if lte IE 9]>
+    <link rel="stylesheet" type="text/css" media="screen" href="path/css/bigdesk/CssGrid_2/ie.css"/><![endif]-->
 
     <!-- The 1140px Grid - http://cssgrid.net/ -->
-    <link rel="stylesheet" type="text/css" media="screen" href="path/css/bigdesk/CssGrid_2/1140.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="path/css/bigdesk/CssGrid_2/styles.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="path/css/bigdesk/CssGrid_2/1140.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="path/css/bigdesk/CssGrid_2/styles.css"/>
 
     <!-- bigdesk styles -->
-    <link rel="stylesheet" type="text/css" media="screen" href="path/css/bigdesk/bigdesk.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="path/js/bigdesk/charts/common.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="path/js/bigdesk/charts/not-available/not-available-chart.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="path/js/bigdesk/charts/time-series/time-series-chart.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="path/js/bigdesk/charts/time-area/time-area-chart.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="path/js/bigdesk/charts/pack/pack.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="path/css/bigdesk/bigdesk.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="path/js/bigdesk/charts/common.css"/>
+    <link rel="stylesheet" type="text/css" media="screen"
+          href="path/js/bigdesk/charts/not-available/not-available-chart.css"/>
+    <link rel="stylesheet" type="text/css" media="screen"
+          href="path/js/bigdesk/charts/time-series/time-series-chart.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="path/js/bigdesk/charts/time-area/time-area-chart.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="path/js/bigdesk/charts/pack/pack.css"/>
 
     <!--  css3-mediaqueries-js -->
     <script type="text/javascript" src="path/js/bigdesk/lib/css3-mediaqueries/css3-mediaqueries.js"></script>
@@ -76,14 +79,14 @@
 <body onload="checkServer();">
 <div class="container">
     <form>
-    <div class="row connectionPanel">
-        <div class="sixcol">
+        <div class="row connectionPanel">
+            <div class="sixcol">
             <span class="connectionPanelSectionWithoutDecoration">
                 ES node REST endpoint
-                <input id="restEndPoint" type="text" size="40" value="http://localhost:9200" />
+                <input id="restEndPoint" type="text" size="40" value="http://localhost:9200"/>
             </span>
-        </div>
-        <div class="sixcol last">
+            </div>
+            <div class="sixcol last">
             <span class="connectionPanelSection">
             Refresh every
             <select id="refreshInterval">
@@ -95,7 +98,7 @@
                 <option value="30000" label="30 sec">30 sec</option>
             </select>
             </span>
-            <span class="connectionPanelSection">
+                <span class="connectionPanelSection">
                 Keep
                 <select id="storeSize">
                     <option value="10000" label="10 sec">10 sec</option>
@@ -110,23 +113,25 @@
                 </select>
                 history
             </span>
-            <span class="connectionPanelSectionWithoutDecoration">
+                <span class="connectionPanelSectionWithoutDecoration">
                 <input id="connectButton" type="button" value="Connect"/>
             </span>
-            <span id="ajaxIndicator">&nbsp;&nbsp;&nbsp;</span>
+                <span id="ajaxIndicator">&nbsp;&nbsp;&nbsp;</span>
+            </div>
         </div>
-    </div>
     </form>
     <div id="selectedViewDetail"></div>
 </div>
 <script>
-function checkServer(){
-	if(location.hostname != ""){
-		if($("#restEndPoint").val() == "http://localhost:9200"){
-			$("#restEndPoint").val(location.protocol+"//"+location.hostname+":9200");
-		}
-	}
-}
+    function checkServer() {
+        // 获取缓存ES地址
+        getAddress();
+        if (location.hostname != "") {
+            if ($("#restEndPoint").val() == "http://localhost:9200") {
+                $("#restEndPoint").val(location.protocol + "//" + location.hostname + ":9200");
+            }
+        }
+    }
 </script>
 </body>
 </html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<!-- saved from url=(0054)http://www.jq22.com/demo/jquerydsjywmoban201911251123/ -->
+<html lang="en" xmlns:cursor="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta name="Generator" content="EditPlus®">
+    <meta name="Author" content="">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <link rel="icon" href="path/images/root.png" type="image/png">
+    <style type="text/css">
+        body {
+            background-size: 100% 100%;
+            font-weight: bold;
+            font-family: 苹方;
+            overflow: hidden;
+            background: linear-gradient(-45deg, #17213e, #000000, #006970, #007c5f);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .main {
+            width: 1024px;
+            height: 768px;
+            position: relative;
+            margin: auto;
+        }
+
+        div {
+            border: 0px solid white;
+            margin: 1px;
+        }
+
+        .layer {
+            position: relative;
+            width: 100%;
+        }
+
+        #layer01 {
+        }
+
+        #layer01 img {
+            text-align: center;
+            display: block;
+            height: 35px;
+            padding-top: 35px;
+            margin: auto;
+        }
+
+        #layer02 > div {
+            height: 100%;
+            float: left;
+            position: relative;
+        }
+
+        .layer02-data {
+            position: absolute;
+            width: auto;
+            height: 100px;
+            color: white;
+            top: 45px;
+            left: 65px;
+        }
+
+        .layer03-panel {
+            height: 100%;
+            position: relative;
+            float: left;
+        }
+
+        .layer03-left-label {
+            position: absolute;
+        }
+
+        #layer03_left_label01 {
+            top: 10px;
+            left: 10px;
+            color: white;
+            height: 20px;
+            width: 200px;
+            font-weight: bold;
+        }
+
+        #layer03_left_label02 {
+            right: 10px;
+            top: 10px;
+            color: #036769;
+            height: 20px;
+            width: 200px;
+        }
+
+        .layer03-left-chart {
+            position: relative;
+            float: left;
+            height: 100%;
+        }
+
+        #layer03_right_label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            height: 20px;
+            width: 100px;
+        }
+
+        .layer03-right-chart {
+            position: relative;
+            float: left;
+            height: 100%;
+            width: 32%;
+        }
+
+        .layer03-right-chart-label {
+            color: white;
+            text-align: center;
+            position: absolute;
+            bottom: 60px;
+            width: 100%;
+        }
+
+        .layer04-panel {
+            position: relative;
+            float: left;
+            height: 100%;
+            width: 48%;
+        }
+
+        .layer04-panel-label {
+            width: 100%;
+            height: 15%;
+            color: white;
+            padding-top: 5px;
+        }
+
+        .layer04-panel-chart {
+            width: 100%;
+            height: 85%;
+        }
+    </style>
+    <script src="path/js/dash_board/jquery-1.10.2.js"></script>
+    <script src="path/js/dash_board/jquery.min.js"></script>
+    <script src="path/js/dash_board/echarts-4.2.1.min.js"></script>
+    <script src="path/js/dash_board/echarts.min.js"></script>
+    <script src="path/js/dash_board/monitor.js"></script>
+    <script src="path/js/dash_board/dash_board.js"></script>
+    <script type="text/javascript">
+        function refresh(){
+            window.location.reload();
+        }
+        setTimeout('refresh()',10000); //指定10秒刷新一次
+
+        $(function () {
+            drawLayer02Label($("#layer02_01 canvas").get(0), "集群名称（状态）", 80, 200);
+            drawLayer02Label($("#layer02_02 canvas").get(0), "总体数据量", 80, 300);
+            drawLayer02Label($("#layer02_03 canvas").get(0), "占用存储大小GB", 80, 400);
+            drawLayer02Label($("#layer02_04 canvas").get(0), "分片总数", 50, 200);
+            drawLayer02Label($("#layer02_05 canvas").get(0), "节点数量", 40, 200);
+            drawLayer02Label($("#layer02_06 canvas").get(0), "索引数量", 50, 200);
+
+            // 刷新HEAD概览-统计量请求
+            clusterStats();
+
+            renderLegend();
+
+            //饼状图
+            renderChartBar01();
+            //renderChartBar02();
+
+            //存储 -- 刷新圆形占比图统计量平均值
+            renderLayer03Right();
+
+            //30天日均线流量趋势
+            renderLayer04Left();
+
+            //集群性能
+            renderLayer04Right();
+
+            // 点击跳转到节点详情巡查页面
+            clickToBigdesk();
+        });
+    </script>
+    <title>DASH BOARD</title>
+</head>
+<body style="">
+<div class="main">
+    <div id="layer02" class="layer" style="height:15%;">
+        <div id="layer02_01" style="width:20%;">
+            <div class="layer02-data">
+                <span style="font-size:16px;" class="clusterStats">elasticsearch</span>
+            </div>
+            <canvas width="200" height="100"></canvas>
+        </div>
+        <div id="layer02_02" style="width:20%;">
+            <div class="layer02-data">
+                <span style="font-size:16px;" class="clusterDocs">0</span>
+            </div>
+            <canvas width="200" height="100"></canvas>
+        </div>
+        <div id="layer02_03" style="width:21%;">
+            <div class="layer02-data">
+                <span style="font-size:16px;" class="clusterStore">0</span>
+            </div>
+            <canvas width="200" height="100"></canvas>
+        </div>
+        <div id="layer02_04" style="width:12%;">
+            <div class="layer02-data">
+                <span style="font-size:16px;" class="clusterShards">0</span>
+            </div>
+            <canvas width="120" height="100"></canvas>
+        </div>
+        <div id="layer02_05" style="width:12%;">
+            <div class="layer02-data">
+                <span style="font-size:16px;" class="clusterNodes">0</span>
+            </div>
+            <canvas width="120" height="100"></canvas>
+        </div>
+        <div id="layer02_06" style="width:12%;">
+            <div class="layer02-data">
+                <span style="font-size:16px;" class="clusterIndices">0</span>
+            </div>
+            <canvas width="120" height="100"></canvas>
+        </div>
+    </div>
+    <div id="layer03" class="layer" style="height:40%;">
+        <div id="layer03_left" style="width:48%;" class="layer03-panel">
+            <div id="layer03_left_label01" class="layer03-left-label">索引数据量占比</div>
+
+            <div id="layer03_left_01" class="layer03-left-chart" style="width:16%;">
+                <canvas width="100" height="225" style="margin:30px 0 0 20px;"></canvas>
+            </div>
+            <div id="layer03_left_02" class="layer03-left-chart"
+                 style="width: 80%; -webkit-tap-highlight-color: transparent; user-select: none; position: relative;"
+                 _echarts_instance_="ec_1575012415475">
+                <div style="position: relative; overflow: hidden; width: 393px; height: 307px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+                    <canvas data-zr-dom-id="zr_0" width="393" height="307"
+                            style="position: absolute; left: 0px; top: 0px; width: 393px; height: 307px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
+                </div>
+                <div></div>
+            </div>
+
+        </div>
+        <div id="layer03_right" style="width:50%;" class="layer03-panel">
+            <div id="layer03_right_label" onclick="clickToBigdesk()" style="z-index: 10;cursor: pointer">平均使用量</div>
+            <div id="layer03_right_chart01" class="layer03-right-chart">
+                <canvas width="130" height="150" style="margin:40px 0 0 20px;"></canvas>
+                <div class="layer03-right-chart-label">CPU</div>
+            </div>
+            <div id="layer03_right_chart02" class="layer03-right-chart">
+                <canvas width="130" height="150" style="margin:40px 0 0 20px;"></canvas>
+                <div class="layer03-right-chart-label">HEAP</div>
+            </div>
+            <div id="layer03_right_chart03" class="layer03-right-chart">
+                <canvas width="130" height="150" style="margin:40px 0 0 20px;"></canvas>
+                <div class="layer03-right-chart-label">DISK</div>
+            </div>
+        </div>
+    </div>
+    <div id="layer04" class="layer" style="height:30%;">
+        <div id="layer04_left" class="layer04-panel">
+            <div id="layer04_left_label" class="layer04-panel-label">30天日均线流量趋势</div>
+            <div id="layer04_left_chart" class="layer04-panel-chart" _echarts_instance_="ec_1575012415476"
+                 style="-webkit-tap-highlight-color: transparent; user-select: none; position: relative;">
+                <div style="position: relative; overflow: hidden; width: 492px; height: 195px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+                    <canvas data-zr-dom-id="zr_0" width="492" height="195"
+                            style="position: absolute; left: 0px; top: 0px; width: 492px; height: 195px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
+                </div>
+                <div></div>
+            </div>
+        </div>
+        <div id="layer04_right" class="layer04-panel">
+            <div id="layer04_right_label" class="layer04-panel-label">
+                <span>集群性能/</span><span style="color:#00A09A;">近一个小时</span>
+            </div>
+            <div id="layer04_right_chart" class="layer04-panel-chart" _echarts_instance_="ec_1575012415477"
+                 style="-webkit-tap-highlight-color: transparent; user-select: none; position: relative;">
+                <div style="position: relative; overflow: hidden; width: 492px; height: 195px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+                    <canvas data-zr-dom-id="zr_0" width="492" height="195"
+                            style="position: absolute; left: 0px; top: 0px; width: 492px; height: 195px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
+                </div>
+                <div style="position: absolute; display: none; border-style: solid; white-space: nowrap; z-index: 9999999; transition: left 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0s, top 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0s; background-color: rgba(50, 50, 50, 0.7); border-width: 0px; border-color: rgb(51, 51, 51); border-radius: 4px; color: rgb(255, 255, 255); font: 14px/21px &quot;Microsoft YaHei&quot;; padding: 5px; left: 295px; top: 19px; pointer-events: none;">
+                    14:20<br><span
+                        style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#F3891B;"></span>网络:
+                    210<br><span
+                        style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#006AD4;"></span>内存:
+                    310<br><span
+                        style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#009895;"></span>CPU:
+                    410
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
+

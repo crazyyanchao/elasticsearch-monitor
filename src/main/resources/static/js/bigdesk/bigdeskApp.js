@@ -23,7 +23,7 @@ var nodesView = {
     clusterHealthView: undefined,
     clusterNodesListView: undefined,
 
-    render: function(cluster) {
+    render: function (cluster) {
 
         var nodesViewTemplate = Mustache.render(templates.nodesViewTemplate, {});
         $("#selectedViewDetail").empty().append(nodesViewTemplate);
@@ -35,7 +35,7 @@ var nodesView = {
         this.clusterNodesListView.render();
     },
 
-    showNodeDetail: function(cluster, nodeId) {
+    showNodeDetail: function (cluster, nodeId) {
         if (this.clusterNodesListView == undefined) {
             this.clusterNodesListView = new ClusterNodesListView({el: $("#clusterNodes"), model: cluster});
             this.clusterNodesListView.render();
@@ -43,7 +43,7 @@ var nodesView = {
         this.clusterNodesListView.showNodeDetail(nodeId);
     },
 
-    clear: function() {
+    clear: function () {
         if (this.clusterHealthView != undefined) {
             this.clusterHealthView.clear();
         }
@@ -59,7 +59,7 @@ var clusterView = {
     clusterHealthView: undefined,
     clusterStateView: undefined,
 
-    render: function(cluster) {
+    render: function (cluster) {
 
         var clusterViewTemplate = Mustache.render(templates.clusterViewTemplate, {});
         $("#selectedViewDetail").empty().append(clusterViewTemplate);
@@ -71,7 +71,7 @@ var clusterView = {
 //        this.clusterStateView.render();
     },
 
-    clear: function() {
+    clear: function () {
         if (this.clusterHealthView != undefined) {
             this.clusterHealthView.clear();
         }
@@ -85,14 +85,14 @@ var selectedView = undefined;
 
 var selectedClusterName = undefined;
 
-var connectTo = function(url, refreshInterval, storeSize, dispatcher, selectedView, callback) {
+var connectTo = function (url, refreshInterval, storeSize, dispatcher, selectedView, callback) {
 
-    var connectionConfig = { baseUrl: url };
-    var clusterHealth = new ClusterHealth({},connectionConfig);
+    var connectionConfig = {baseUrl: url};
+    var clusterHealth = new ClusterHealth({}, connectionConfig);
 
     clusterHealth.fetch({
 
-        success: function(model, response) {
+        success: function (model, response) {
 
             var clusterName = model.get("cluster_name");
             var cluster = bigdeskStore.getCluster(clusterName);
@@ -104,7 +104,6 @@ var connectTo = function(url, refreshInterval, storeSize, dispatcher, selectedVi
                 console.log("Found a new cluster [" + clusterName + "]");
 
                 bigdeskStore.addCluster(
-
                     // Keep in mind 'new Cluster()' is a heavy operation
                     // because it performs several AJAX calls.
                     new Cluster({
@@ -135,27 +134,28 @@ var connectTo = function(url, refreshInterval, storeSize, dispatcher, selectedVi
             }
         },
 
-        error: function(model, response) { /* can not handle in JSONP */ }
+        error: function (model, response) { /* can not handle in JSONP */
+        }
 
     });
 };
 
-var disconnectFrom = function(url, callback) {
+var disconnectFrom = function (url, callback) {
 
-    var disconnectFromCluster = function(cluster) {
+    var disconnectFromCluster = function (cluster) {
         cluster.clearIntervals();
         cluster.clearTimeouts();
         selectedView.clear();
     };
 
     // Iterate through all clusters having baseUrl == url and disconnect from them.
-    var disconnectFromURL = function(url) {
+    var disconnectFromURL = function (url) {
         _.each(bigdeskStore.get("cluster")
-            .filter(function(cluster){
-                return cluster.get("health").get("baseUrl") == url;
-            }),
-            function(cluster){
-                console.log("Disconnecting from ["+cluster.id+"]");
+                .filter(function (cluster) {
+                    return cluster.get("health").get("baseUrl") == url;
+                }),
+            function (cluster) {
+                console.log("Disconnecting from [" + cluster.id + "]");
                 disconnectFromCluster(cluster);
             });
         if (callback) {
@@ -166,15 +166,15 @@ var disconnectFrom = function(url, callback) {
     disconnectFromURL(url);
 };
 
-var changeRefreshInterval = function(url, newRefreshInterval) {
+var changeRefreshInterval = function (url, newRefreshInterval) {
 
-    var connectionConfig = { baseUrl: url };
-    var clusterHealth = new ClusterHealth({},connectionConfig);
+    var connectionConfig = {baseUrl: url};
+    var clusterHealth = new ClusterHealth({}, connectionConfig);
 
     // we need to do the health.fetch to get cluster name.
     clusterHealth.fetch({
 
-        success: function(model, response) {
+        success: function (model, response) {
             var clusterName = model.get("cluster_name");
             var cluster = bigdeskStore.getCluster(clusterName);
             if (cluster) {
@@ -183,20 +183,21 @@ var changeRefreshInterval = function(url, newRefreshInterval) {
             }
         },
 
-        error: function(model, response) { /* can not handle in JSONP */ }
+        error: function (model, response) { /* can not handle in JSONP */
+        }
 
     });
 };
 
-var changeStoreSize = function(url, newStoreSize) {
+var changeStoreSize = function (url, newStoreSize) {
 
-    var connectionConfig = { baseUrl: url };
-    var clusterHealth = new ClusterHealth({},connectionConfig);
+    var connectionConfig = {baseUrl: url};
+    var clusterHealth = new ClusterHealth({}, connectionConfig);
 
     // we need to do the health.fetch to get cluster name.
     clusterHealth.fetch({
 
-        success: function(model, response) {
+        success: function (model, response) {
             var clusterName = model.get("cluster_name");
             var cluster = bigdeskStore.getCluster(clusterName);
             if (cluster) {
@@ -204,13 +205,14 @@ var changeStoreSize = function(url, newStoreSize) {
             }
         },
 
-        error: function(model, response) { /* can not handle in JSONP */ }
+        error: function (model, response) { /* can not handle in JSONP */
+        }
 
     });
 };
 
 $(document).ready(
-    function($) {
+    function ($) {
 
         var restEndPoint = $("#restEndPoint"),
             refreshInterval = $("#refreshInterval"),
@@ -218,41 +220,41 @@ $(document).ready(
             button = $("#connectButton"),
             ajaxIndicator = $("#ajaxIndicator");
 
-        var isConnected = function() {
+        var isConnected = function () {
             return (button.val() !== "Connect");
         };
 
-        var getRefreshInterval = function() {
+        var getRefreshInterval = function () {
             return refreshInterval.find(":selected").val();
         };
 
-        var getStoreSize = function() {
+        var getStoreSize = function () {
             return storeSize.find(":selected").val();
         };
 
-        var switchButtonText = function() {
+        var switchButtonText = function () {
             if (isConnected()) {
                 button.val("Connect");
                 restEndPoint.removeAttr('disabled');
             } else {
                 button.val("Disconnect");
-                restEndPoint.attr('disabled','disabled');
+                restEndPoint.attr('disabled', 'disabled');
             }
         };
 
-        refreshInterval.change(function(){
+        refreshInterval.change(function () {
             if (isConnected()) {
                 changeRefreshInterval(restEndPoint.val(), getRefreshInterval());
             }
         });
 
-        storeSize.change(function(){
-           if (isConnected()) {
-               changeStoreSize(restEndPoint.val(), getStoreSize());
-           }
+        storeSize.change(function () {
+            if (isConnected()) {
+                changeStoreSize(restEndPoint.val(), getStoreSize());
+            }
         });
 
-        var ajaxResponseCallback = function(clusterName, restApiName, response) {
+        var ajaxResponseCallback = function (clusterName, restApiName, response) {
 //            console.log("["+clusterName+"] ["+restApiName+"]", response);
 //            var iterator = function(nodeStats) {return nodeStats.id; };
 //            if (restApiName == "cluster > NodesStats") {
@@ -265,7 +267,7 @@ $(document).ready(
             ajaxIndicator.show().css("background-color", "lightgreen").fadeOut("slow");
         };
 
-        var newDataCallback = function(description, data) {
+        var newDataCallback = function (description, data) {
 //            console.log(description, data);
         };
 
@@ -273,7 +275,7 @@ $(document).ready(
         bigdeskEventDispatcher.on("onAjaxResponse", ajaxResponseCallback);
         bigdeskEventDispatcher.on("onNewData", newDataCallback);
 
-        button.click(function(){
+        button.click(function () {
             if (isConnected()) {
                 disconnectFrom(restEndPoint.val(), switchButtonText);
             } else {
@@ -281,26 +283,28 @@ $(document).ready(
             }
         });
 
-        restEndPoint.bind("keypress",function(event){
-            if (typeof event == 'undefined' && window.event) { event = window.event; }
-            if(event.keyCode == 13){
+        restEndPoint.bind("keypress", function (event) {
+            if (typeof event == 'undefined' && window.event) {
+                event = window.event;
+            }
+            if (event.keyCode == 13) {
                 if (event.cancelable && event.preventDefault) {
                     event.preventDefault();
                     button.click();
                 } else {
                     button.click();
                 }
-				return false;
+                return false;
             }
-			return true;
+            return true;
         });
 
-        var getSearchUrlVar = function(key) {
+        var getSearchUrlVar = function (key) {
             var result = new RegExp(key + "=([^&]*)", "i").exec(window.location.search);
             return decodeURIComponent(result && result[1] || "");
         };
 
-        var parseUrlParams = function() {
+        var parseUrlParams = function () {
             return {
                 endpoint: getSearchUrlVar("endpoint") || "http://localhost:9200",
                 refresh: getSearchUrlVar("refresh") || 2000,
@@ -311,7 +315,7 @@ $(document).ready(
 
         // If any URL params are found (i.e. they are provided by the user)
         // then they are applied/set into appropriate form fields.
-        var applyUrlParams = function() {
+        var applyUrlParams = function () {
 
             var params = parseUrlParams();
 
@@ -321,8 +325,8 @@ $(document).ready(
                 if (!getSearchUrlVar("endpoint")) {
                     params.endpoint = window.location.protocol + "//" + window.location.host;
                     var index = window.location.pathname.indexOf("/_plugin");
-                    if (index > 0){
-                    	params.endpoint += window.location.pathname.substr(0, index);
+                    if (index > 0) {
+                        params.endpoint += window.location.pathname.substr(0, index);
                     }
                 }
                 if (!getSearchUrlVar("connect")) {
@@ -341,14 +345,14 @@ $(document).ready(
         var BigdeskRouter = Backbone.Router.extend({
 
             routes: {
-                "nodes" : "nodes",
-                "nodes/master" : "nodes_master",
-                "nodes/:nodeId" : "nodes",
-                "cluster" : "cluster",
-                "*other" : "defaultRoute"
+                "nodes": "nodes",
+                "nodes/master": "nodes_master",
+                "nodes/:nodeId": "nodes",
+                "cluster": "cluster",
+                "*other": "defaultRoute"
             },
 
-            cluster: function() {
+            cluster: function () {
 //                console.log("change route: cluster");
                 if (selectedView && _.isFunction(selectedView.clear)) {
                     selectedView.clear();
@@ -367,7 +371,7 @@ $(document).ready(
                 }
             },
 
-            nodes_master: function() {
+            nodes_master: function () {
 //                console.log("try to connect to the master node");
                 var masterNodeId = "";
                 if (!isConnected() && !applyUrlParamsCalled) {
@@ -379,7 +383,7 @@ $(document).ready(
                 this.navigate("nodes" + masterNodeId, {trigger: true, replace: true});
             },
 
-            nodes: function(nodeId) {
+            nodes: function (nodeId) {
 //                console.log("change route: nodes("+(nodeId||"")+")");
                 if (selectedView && _.isFunction(selectedView.clear)) {
                     selectedView.clear();
@@ -407,7 +411,7 @@ $(document).ready(
                 }
             },
 
-            defaultRoute: function(other) {
+            defaultRoute: function (other) {
                 this.navigate("nodes", {trigger: true, replace: true});
             }
 
@@ -419,3 +423,16 @@ $(document).ready(
 
     }
 );
+
+function getAddress() {
+    // 获取缓存的ES地址
+    $("#restEndPoint").val(sessionStorage.getItem("esClusterAddress"));
+    if ($("#restEndPoint").val() == "") {
+        $("#restEndPoint").val(location.protocol + "//" + location.hostname + ":9200");
+    }
+    // 默认执行一次connect
+    $('#connectButton').click();
+}
+
+
+

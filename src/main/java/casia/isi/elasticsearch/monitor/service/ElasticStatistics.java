@@ -23,25 +23,22 @@ package casia.isi.elasticsearch.monitor.service;
  * 　　　　　　　　　 ┗┻┛　 ┗┻┛+ + + +
  */
 
-import casia.isi.elasticsearch.common.EsAccessor;
 import casia.isi.elasticsearch.common.FieldOccurs;
 import casia.isi.elasticsearch.common.RangeOccurs;
 import casia.isi.elasticsearch.common.SortOrder;
 import casia.isi.elasticsearch.monitor.common.EsUrl;
+import casia.isi.elasticsearch.monitor.common.HttpAccessor;
 import casia.isi.elasticsearch.monitor.common.SysConstant;
 import casia.isi.elasticsearch.monitor.common.TaskAction;
-import casia.isi.elasticsearch.operation.http.HttpPoolSym;
-import casia.isi.elasticsearch.operation.http.HttpProxyRequest;
 import casia.isi.elasticsearch.operation.search.EsIndexSearch;
 import casia.isi.elasticsearch.util.ClientUtils;
 import casia.isi.elasticsearch.util.DateUtil;
-import casia.isi.elasticsearch.util.MD5Digest;
+import casia.isi.elasticsearch.util.FileUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -55,11 +52,12 @@ import java.util.stream.Collectors;
 @Service
 public class ElasticStatistics {
 
-    public HttpProxyRequest request = new HttpProxyRequest(HttpPoolSym.DEFAULT.getSymbolValue());
-
     private EsIndexSearch esIndexSearch;
 
+    private HttpAccessor httpAccessor;
+
     public ElasticStatistics() {
+        this.httpAccessor = new HttpAccessor();
     }
 
     /**
@@ -67,9 +65,84 @@ public class ElasticStatistics {
      * @return
      * @Description: TODO(集群整体情况)
      */
-    public String statistics() {
-        String queryResult = request.httpGet(ClientUtils.referenceUrl(EsUrl._cluster_state_all.url()));
-        return queryResult;
+    public String getClusterBasisInfo(String address) {
+        httpAccessor.removeLastHttpsAddNewAddress(address);
+        String queryResult = httpAccessor.request.httpGet(ClientUtils.referenceUrl(EsUrl._cluster_stats.url()));
+        JSONObject result = JSONObject.parseObject(queryResult);
+        // 集群名称/状态 节点数量(nodes) 索引数量(indices) 分片总数(shards) 总体数据量(docs) 占用存储大小GB
+        JSONObject stats = new JSONObject();
+        stats.put("status", result.getString("status"));
+        stats.put("cluster_name", result.getString("cluster_name"));
+        stats.put("cluster_name_status", result.getString("cluster_name") + "(" + result.getString("status") + ")");
+        stats.put("nodes", result.getJSONObject("_nodes").getIntValue("total"));
+        JSONObject indices = result.getJSONObject("indices");
+        stats.put("indices", indices.getIntValue("count"));
+        stats.put("shards", indices.getJSONObject("shards").getIntValue("total"));
+        stats.put("docs", indices.getJSONObject("docs").getIntValue("count"));
+        stats.put("store", FileUtil.convertFileSizeDescription(indices.getJSONObject("store").getLongValue("size_in_bytes")));
+        return stats.toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(集群整体情况)
+     */
+    public String getClusterAverageBasisInfo(String address) {
+        httpAccessor.removeLastHttpsAddNewAddress(address);
+        String queryResult = httpAccessor.request.httpGet(ClientUtils.referenceUrl(EsUrl._cluster_stats.url()));
+        JSONObject result = JSONObject.parseObject(queryResult);
+        // 集群名称/状态 节点数量(nodes) 索引数量(indices) 分片总数(shards) 总体数据量(docs) 占用存储大小GB
+        JSONObject stats = new JSONObject();
+        stats.put("status", result.getString("status"));
+        stats.put("cluster_name", result.getString("cluster_name"));
+        stats.put("cluster_name_status", result.getString("cluster_name") + "(" + result.getString("status") + ")");
+        stats.put("nodes", result.getJSONObject("_nodes").getIntValue("total"));
+        JSONObject indices = result.getJSONObject("indices");
+        stats.put("cpu", 0.23);
+        stats.put("heap", 0.40);
+        stats.put("disk", 0.56);
+        return stats.toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(各类型数据量统计)
+     */
+    public String getClusterPieStatisticsInfo(String address) {
+        httpAccessor.removeLastHttpsAddNewAddress(address);
+        String[] indexType = new String[]{"monitor_caiji_all", "monitor_caiji_small", "common_caiji", "event_data",
+                "monitor_data", "zdr_caiji", "zdr_data", "monitor_caiji_preprocess"};
+        JSONObject stats = new JSONObject();
+        long count = 0;
+        long zdrCount = 0;
+        for (String type : indexType) {
+            esIndexSearch = new EsIndexSearch(address, "*", type);
+            esIndexSearch.execute(new String[]{"it"});
+            long total = esIndexSearch.getTotal();
+            if ("monitor_caiji_all".equals(type)) {
+                stats.put("all", total);
+            } else if ("monitor_caiji_small".equals(type)) {
+                stats.put("small", total);
+            } else if ("common_caiji".equals(type)) {
+                stats.put("user", total);
+            } else if ("event_data".equals(type)) {
+                stats.put("event", total);
+            } else if ("monitor_data".equals(type)) {
+                stats.put("monitor", total);
+            } else if ("monitor_caiji_preprocess".equals(type)) {
+                stats.put("preprocess", total);
+            } else {
+                zdrCount += total;
+            }
+            count += total;
+        }
+        JSONObject statistics = JSONObject.parseObject(getClusterBasisInfo(address));
+        long docs = statistics.getLongValue("docs") - count;
+        stats.put("other", docs);
+        stats.put("zdr", zdrCount);
+        return stats.toJSONString();
     }
 
     /**
@@ -95,12 +168,7 @@ public class ElasticStatistics {
     public JSONArray daysIndexStatus(String address, String startTime, String stopTime) {
 
         // 重置HTTP模块 - 将上一次注册的地址移除 ， 并加入新的集群地址
-        new EsAccessor() {
-            @Override
-            public void removeLastHttpsAddNewAddress(String ipPorts) {
-                super.removeLastHttpsAddNewAddress(ipPorts);
-            }
-        }.removeLastHttpsAddNewAddress(address);
+        httpAccessor.removeLastHttpsAddNewAddress(address);
 
         JSONArray array = new JSONArray();
         JSONObject mapping = getAllIndices(address);
@@ -143,14 +211,10 @@ public class ElasticStatistics {
      */
     public JSONObject getAllIndices(String address) {
         // 先重置集群地址
-        new EsAccessor() {
-            @Override
-            public void removeLastHttpsAddNewAddress(String ipPorts) {
-                super.removeLastHttpsAddNewAddress(ipPorts);
-            }
-        }.removeLastHttpsAddNewAddress(address);
 
-        String queryResult = request.httpGet(ClientUtils.referenceUrl(EsUrl._mapping.url()));
+        httpAccessor.removeLastHttpsAddNewAddress(address);
+
+        String queryResult = httpAccessor.request.httpGet(ClientUtils.referenceUrl(EsUrl._mapping.url()));
         JSONObject object = JSONObject.parseObject(queryResult);
         JSONObject mapping = new JSONObject();
         for (String indexName : object.keySet()) {
@@ -239,7 +303,7 @@ public class ElasticStatistics {
                     JSONObject task = taskDetail.getJSONObject("task");
 
 //                    String md5 = MD5Digest.MD5(task.getString("description"));
-                    taskObj.put("lastTaskId",currentTaskId);
+                    taskObj.put("lastTaskId", currentTaskId);
                     String md5 = task.getString("description");
                     taskObj.putAll(task);
                     if (md5Task.containsKey(md5)) {
@@ -262,14 +326,11 @@ public class ElasticStatistics {
      * @Description: TODO(根据任务ID获取任务详情)
      */
     public JSONObject getTaskDetailById(String address, String taskId) {
+
         // 重置HTTP模块 - 将上一次注册的地址移除 ， 并加入新的集群地址
-        esIndexSearch.removeLastHttpsAddNewAddress(address); // 重置集群HTTP池
-        HttpAccessor httpAccessor = new HttpAccessor();
+        httpAccessor.removeLastHttpsAddNewAddress(address); // 重置集群HTTP池
         String queryResult = httpAccessor.request.httpGet(EsUrl._tasks.url() + "/" + taskId);
         return JSONObject.parseObject(queryResult);
-    }
-
-    private class HttpAccessor extends EsAccessor {
     }
 
     /**
@@ -278,10 +339,9 @@ public class ElasticStatistics {
      * @Description: TODO(查看集群上正在运行的删除任务)
      */
     public JSONObject clusterDeleteTask(String address) {
-        // 重置HTTP模块 - 将上一次注册的地址移除 ， 并加入新的集群地址
-        esIndexSearch.removeLastHttpsAddNewAddress(address); // 重置集群HTTP池
 
-        HttpAccessor httpAccessor = new HttpAccessor();
+        // 重置HTTP模块 - 将上一次注册的地址移除 ， 并加入新的集群地址
+        httpAccessor.removeLastHttpsAddNewAddress(address); // 重置集群HTTP池
         String queryResult = httpAccessor.request.httpGet(EsUrl._tasks.url());
         return JSONObject.parseObject(queryResult);
     }
@@ -297,7 +357,7 @@ public class ElasticStatistics {
 //            String md5 = MD5Digest.MD5(taskObj.getString("description"));
             String md5 = taskObj.getString("description");
 
-            taskObj.put("lastTaskId",taskId);
+            taskObj.put("lastTaskId", taskId);
             taskObj.put("completed", task.getJSONObject("_source").getBooleanValue("completed"));
             // TRANSFER TIME
             taskObj.put("start_time", DateUtil.millToTimeStr(taskObj.getLongValue("start_time_in_millis")));

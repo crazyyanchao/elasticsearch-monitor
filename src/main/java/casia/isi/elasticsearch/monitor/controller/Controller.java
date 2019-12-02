@@ -24,30 +24,21 @@ package casia.isi.elasticsearch.monitor.controller;
  */
 
 import casia.isi.elasticsearch.common.EsAccessor;
+import casia.isi.elasticsearch.monitor.common.HttpAccessor;
 import casia.isi.elasticsearch.monitor.entity.UserJson;
 import casia.isi.elasticsearch.monitor.service.ElasticStatistics;
 import casia.isi.elasticsearch.monitor.common.Message;
 import casia.isi.elasticsearch.monitor.common.SysConstant;
 import casia.isi.elasticsearch.monitor.entity.MailBean;
 import casia.isi.elasticsearch.monitor.service.MailService;
-import casia.isi.elasticsearch.operation.http.HttpPoolSym;
-import casia.isi.elasticsearch.operation.http.HttpProxyRegister;
 import casia.isi.elasticsearch.operation.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
-import org.frameworkset.spi.remote.http.ClientConfiguration;
-import org.frameworkset.spi.remote.http.HttpRequestUtil;
-import org.frameworkset.spi.remote.http.proxy.HealthCheck;
-import org.frameworkset.spi.remote.http.proxy.HttpAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * @author YanchaoMa yanchaoma@foxmail.com
@@ -73,7 +64,18 @@ public class Controller {
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     public String index(ModelMap modelMap) {
         modelMap.put("msg", "SpringBoot Elasticsearch Monitor");
-        return "index";
+        return "elasticsearch_monitor/index";
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(Monitor Instrument Index) http://localhost:7100/toolkit/dash_board
+     */
+    @RequestMapping(value = "/dash_board", method = RequestMethod.GET)
+    public String dash_board(ModelMap modelMap) {
+        modelMap.put("msg", "SpringBoot Elasticsearch Monitor");
+        return "elasticsearch_monitor/dash_board";
     }
 
     /**
@@ -84,7 +86,7 @@ public class Controller {
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login(ModelMap modelMap) {
         modelMap.put("msg", "SpringBoot Elasticsearch Monitor Login");
-        return "login";
+        return "elasticsearch_monitor/login";
     }
 
     /**
@@ -106,7 +108,7 @@ public class Controller {
     @RequestMapping(value = "/readme", method = RequestMethod.GET)
     public String readme(ModelMap modelMap) {
         modelMap.put("msg", "SpringBoot Elasticsearch Monitor Readme");
-        return "readme";
+        return "readme/readme";
     }
 
     /**
@@ -131,12 +133,7 @@ public class Controller {
         String address = userJson.getAddress();
 
         // 先重置集群地址
-        new EsAccessor() {
-            @Override
-            public void removeLastHttpsAddNewAddress(String ipPorts) {
-                super.removeLastHttpsAddNewAddress(ipPorts);
-            }
-        }.removeLastHttpsAddNewAddress(userJson.getAddress());
+        new HttpAccessor().removeLastHttpsAddNewAddress(userJson.getAddress());
 
         HttpRequest httpRequest = new HttpRequest();
         boolean status = httpRequest.checkHttpGet(address);
@@ -151,13 +148,7 @@ public class Controller {
     @RequestMapping(value = "/removeLastHttpsAddNewAddress", method = RequestMethod.POST)
     @ResponseBody
     public String removeLastHttpsAddNewAddress(@RequestBody UserJson userJson) {
-        new EsAccessor() {
-            @Override
-            public void removeLastHttpsAddNewAddress(String ipPorts) {
-                super.removeLastHttpsAddNewAddress(ipPorts);
-            }
-        }.removeLastHttpsAddNewAddress(userJson.getAddress());
-
+        new HttpAccessor().removeLastHttpsAddNewAddress(userJson.getAddress());
         return JSONObject.parseObject(JSON.toJSONString(userJson)).toJSONString();
     }
 
@@ -268,9 +259,49 @@ public class Controller {
     @ResponseBody
     public String getMonitorDeleteTaskId(@RequestBody UserJson userJson) {
         return new Message().setStatus(true)
-                .putResult(elasticStatistics.getTaskDetailById(userJson.getAddress(),userJson.getTaskId()))
+                .putResult(elasticStatistics.getTaskDetailById(userJson.getAddress(), userJson.getTaskId()))
                 .toJSONString();
     }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(CLUSTER STATISTICS BASIS INFORMATION)
+     */
+    @RequestMapping(value = "/cluster-basis-info", method = RequestMethod.POST)
+    @ResponseBody
+    public String getClusterBasisInfo(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.getClusterBasisInfo(userJson.getAddress()))
+                .toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(CLUSTER STATISTICS INFORMATION)
+     */
+    @RequestMapping(value = "/cluster-average-basis-info", method = RequestMethod.POST)
+    @ResponseBody
+    public String getClusterAverageBasisInfo(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.getClusterAverageBasisInfo(userJson.getAddress()))
+                .toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(CLUSTER STATISTICS INFORMATION)
+     */
+    @RequestMapping(value = "/cluster-pie-statistics-info", method = RequestMethod.POST)
+    @ResponseBody
+    public String getClusterPieStatisticsInfo(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.getClusterPieStatisticsInfo(userJson.getAddress()))
+                .toJSONString();
+    }
+
 }
 
 
