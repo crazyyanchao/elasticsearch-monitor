@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>JSON</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+
+    <link href="path/css/jquery.json-viewer.css" rel="stylesheet">
+    <link href="path/css/loading.css" rel="stylesheet">
+    <link href="path/css/other.css" rel="stylesheet">
+    <link rel="icon" href="path/images/root.png" type="image/png">
+</head>
+
+<!--<body style="background: url(path/images/bg.jpg);">-->
+<body onload="checkJson()" style="background-color: initial;">
+
+<script type='text/javascript' src="path/js/d3.js" charset="utf-8"></script>
+<script type='text/javascript' src='path/js/jquery-2.2.4.min.js'></script>
+<script src="path/js/jquery.json-viewer.js"></script>
+
+<div id="loading">
+    <div class="loadingImage"></div>
+</div>
+
+<div id="json-renderer"
+     style="position: relative; color: rgba(15,1,3,0.89);display:  inline-block;position:  initial;width:  766px;right: 401px;top: 280px;height: auto;">
+</div>
+
+<script>
+
+    function checkJson() {
+        var data = JSON.parse(sessionStorage.getItem("temp-json-data"));
+        $('#json-renderer').jsonViewer(data, {collapsed: false, withQuotes: true});
+    }
+    //debugger
+    // WHOLE PAGE LOADING
+    $("#loading").fadeOut(400);
+</script>
+</body>
+</html>
+
+

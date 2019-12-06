@@ -8,7 +8,9 @@
     <meta name="Author" content="">
     <meta name="Keywords" content="">
     <meta name="Description" content="">
-    <link rel="icon" href="path/images/root.png" type="image/png">
+    <link href="path/css/elasticsearch_monitor/table.css" rel="stylesheet" type="text/css">
+    <link href="path/css/elasticsearch_monitor/toolTip.css" rel="stylesheet" type="text/css">
+    <link href="path/css/loading.css" rel="stylesheet">
     <style type="text/css">
         body {
             background-size: 100% 100%;
@@ -150,6 +152,37 @@
             width: 100%;
             height: 85%;
         }
+
+        /*弹出框*/
+        .black_overlay {
+            opacity: 0.60;
+            display: none;
+            position: absolute;
+            top: 0%;
+            left: 0%;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            z-index: 1001;
+            -moz-opacity: 0.8;
+            filter: alpha(opacity=88);
+        }
+
+        .white_content {
+            opacity: 0.60;
+            display: none;
+            position: absolute;
+            top: 20%;
+            left: 21%;
+            width: 55%;
+            height: 23%;
+            padding: 20px;
+            border: 10px solid orange;
+            background-color: white;
+            z-index: 1002;
+            overflow: auto;
+        }
+
     </style>
     <script src="path/js/dash_board/jquery-1.10.2.js"></script>
     <script src="path/js/dash_board/jquery.min.js"></script>
@@ -157,11 +190,14 @@
     <script src="path/js/dash_board/echarts.min.js"></script>
     <script src="path/js/dash_board/monitor.js"></script>
     <script src="path/js/dash_board/dash_board.js"></script>
+    <script type='text/javascript' src="path/js/d3.js" charset="utf-8"></script>
+    <script src="path/js/jquery.json-viewer.js"></script>
     <script type="text/javascript">
-        function refresh(){
+        function refresh() {
             window.location.reload();
         }
-        setTimeout('refresh()',10000); //指定10秒刷新一次
+
+        setTimeout('refresh()', 300000); //指定秒刷新一次
 
         $(function () {
             drawLayer02Label($("#layer02_01 canvas").get(0), "集群名称（状态）", 80, 200);
@@ -174,20 +210,29 @@
             // 刷新HEAD概览-统计量请求
             clusterStats();
 
+            // 刷新表格数据
+            clusterIndicesTimeLine();
+
+            // 鼠标选中表格
+            tableMouseover();
+
             renderLegend();
 
-            //饼状图
+            // 饼状图-左侧
             renderChartBar01();
-            //renderChartBar02();
+            // renderChartBar02();
+
+            // 饼状图-右侧
+            // renderChartBar02();
 
             //存储 -- 刷新圆形占比图统计量平均值
-            renderLayer03Right();
+            // renderLayer03Right();
 
             //30天日均线流量趋势
-            renderLayer04Left();
+            // renderLayer04Left();
 
             //集群性能
-            renderLayer04Right();
+            // renderLayer04Right();
 
             // 点击跳转到节点详情巡查页面
             clickToBigdesk();
@@ -196,6 +241,25 @@
     <title>DASH BOARD</title>
 </head>
 <body style="">
+<div id="loading">
+    <div class="loadingImage"></div>
+</div>
+<!--弹出框-->
+<div id="light" class="white_content">
+    <a href="javascript:void(0)" onclick="closeDialog()">close</a>
+    <a href="javascript:void(0)" onclick="checkJsonInner()">check-json</a>
+    <!--<a href="javascript:void(0)" onclick="checkJson()">check-json</a>-->
+    <div id="light-json-renderer"
+         style="position: relative; color: rgba(15,1,3,0.89);display:  inline-block;position:  initial;width:  766px;right: 401px;top: 280px;height: auto;">
+    </div>
+</div>
+<div id="fade" class="black_overlay"></div>
+<!--<div id="json-renderer"-->
+<!--style="position: relative; color: rgba(242,247,30,0.89);display:  inline-block;position:  absolute;width:  766px;right: 401px;top: 280px;height: auto;">-->
+<!--</div>-->
+<div id="json-renderer"
+     style="position: relative; color: rgba(242,247,30,0.89);display:  contents;position:  absolute;width:  766px;right: 401px;top: 280px;height: auto;">
+</div>
 <div class="main">
     <div id="layer02" class="layer" style="height:15%;">
         <div id="layer02_01" style="width:20%;">
@@ -237,10 +301,13 @@
     </div>
     <div id="layer03" class="layer" style="height:40%;">
         <div id="layer03_left" style="width:48%;" class="layer03-panel">
-            <div id="layer03_left_label01" class="layer03-left-label">索引数据量占比</div>
+            <div id="layer03_left_label01" class="layer03-left-label" onclick="clickToBigdesk()"
+                 style="z-index: 10;cursor: pointer">索引数据量占比
+                <div style="color: cyan; font-size:1px">(点击巡查节点性能/资源)</div>
+            </div>
 
             <div id="layer03_left_01" class="layer03-left-chart" style="width:16%;">
-                <canvas width="100" height="225" style="margin:30px 0 0 20px;"></canvas>
+                <canvas width="100" height="225" style="margin:36px 0 0 20px;"></canvas>
             </div>
             <div id="layer03_left_02" class="layer03-left-chart"
                  style="width: 80%; -webkit-tap-highlight-color: transparent; user-select: none; position: relative;"
@@ -254,58 +321,258 @@
 
         </div>
         <div id="layer03_right" style="width:50%;" class="layer03-panel">
-            <div id="layer03_right_label" onclick="clickToBigdesk()" style="z-index: 10;cursor: pointer">平均使用量</div>
-            <div id="layer03_right_chart01" class="layer03-right-chart">
-                <canvas width="130" height="150" style="margin:40px 0 0 20px;"></canvas>
-                <div class="layer03-right-chart-label">CPU</div>
+            <div id="view_statistics_data" style="position:  relative;">
+                <a href="javascript:void(0)" id="alarm-statistics" style="color: rgba(212,11,7,0.89);font-size: 20px;">
+                    1.查看监测统计数据
+                </a>
             </div>
-            <div id="layer03_right_chart02" class="layer03-right-chart">
-                <canvas width="130" height="150" style="margin:40px 0 0 20px;"></canvas>
-                <div class="layer03-right-chart-label">HEAP</div>
+            <div id="send_email_box" style="position:  relative;">
+                <a href="javascript:void(0)" id="send-email" style="color: rgba(212,11,7,0.89);font-size: 20px;">
+                    2.以邮件方式发送监测报告
+                </a>
             </div>
-            <div id="layer03_right_chart03" class="layer03-right-chart">
-                <canvas width="130" height="150" style="margin:40px 0 0 20px;"></canvas>
-                <div class="layer03-right-chart-label">DISK</div>
+            <div id="view_all_index" style="position:  relative;">
+                <a href="javascript:void(0)" id="get-all-indices" style="color: rgba(212,11,7,0.89);font-size: 20px;">
+                    3.查看集群所有索引列表
+                </a>
+            </div>
+            <div id="view_all_24h" style="position:  relative;">
+                <a href="javascript:void(0)" id="24h-statistics" style="color: rgba(212,11,7,0.89);font-size: 20px;">
+                    4.查看最近24小时各索引数据统计量
+                </a>
+            </div>
+            <div id="view_all_7d" style="position:  relative;">
+                <a href="javascript:void(0)" id="7d-statistics" style="color: rgba(212,11,7,0.89);font-size: 20px;">
+                    5.查看最近一周各索引数据统计量
+                </a>
+            </div>
+            <div id="view_all_delete" style="position:  relative;">
+                <a href="javascript:void(0)" id="delete-statistics"
+                   style="color: rgba(212,11,7,0.89); font-size: 20px;">
+                    6.集群删除任务巡查【包括最近24小时内运行过的删除任务和现在正在运行的删除任务】
+                </a>
+            </div>
+            <div id="view_all_delete_01" style="position:  relative;">
+                <a href="javascript:void(0)" id="delete-statistics_view_all_delete_01"
+                   style="color: rgba(212,11,7,0.89);font-size: 20px;">
+                    7.查看正在运行的删除任务
+                </a>
+            </div>
+            <div id="view_all_delete_02" style="position:  relative;">
+                <a href="javascript:void(0)" id="delete-statistics_view_all_delete_02"
+                   style="color: rgba(212,11,7,0.89);font-size: 20px;">
+                    8.查看最近24小时内运行过的删除任务【不包含正在运行的任务】
+                </a>
             </div>
         </div>
     </div>
     <div id="layer04" class="layer" style="height:30%;">
-        <div id="layer04_left" class="layer04-panel">
-            <div id="layer04_left_label" class="layer04-panel-label">30天日均线流量趋势</div>
-            <div id="layer04_left_chart" class="layer04-panel-chart" _echarts_instance_="ec_1575012415476"
-                 style="-webkit-tap-highlight-color: transparent; user-select: none; position: relative;">
-                <div style="position: relative; overflow: hidden; width: 492px; height: 195px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
-                    <canvas data-zr-dom-id="zr_0" width="492" height="195"
-                            style="position: absolute; left: 0px; top: 0px; width: 492px; height: 195px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
-                </div>
-                <div></div>
+        <div id="layer04_left" class="table">
+            <h2 class="table-caption">各索引最早最晚一条数据的时间：</h2>
+            <!--此行代码用于，控制列的样式。-->
+            <div class="table-column-group">
+                <div class="table-column"></div>
+                <div class="table-column"></div>
+                <div class="table-column"></div>
+                <div class="table-column"></div>
             </div>
+            <!--如果不写上一个div, 也可以把样式写在以下div里。 -->
+            <div class="table-header-group">
+                <ul class="table-row">
+                    <li class="table-cell">索引类型（数据保留时长）</li>
+                    <li class="table-cell">索引类型名</li>
+                    <li class="table-cell">最早数据时间</li>
+                    <li class="table-cell">最近数据时间</li>
+                </ul>
+            </div>
+            <div class="table-row-group">
+                <ul class="table-row">
+                    <li class="table-cell">大索引（7d）</li>
+                    <li class="table-cell">monitor_caiji_all</li>
+                    <li class="table-cell-earliest-monitor_caiji_all">-</li>
+                    <li class="table-cell-latest-monitor_caiji_all">-</li>
+                </ul>
+                <ul class="table-row">
+                    <li class="table-cell">小索引（3d）</li>
+                    <li class="table-cell">monitor_caiji_small</li>
+                    <li class="table-cell-earliest-monitor_caiji_small">-</li>
+                    <li class="table-cell-latest-monitor_caiji_small">-</li>
+                </ul>
+                <ul class="table-row">
+                    <li class="table-cell">预处理索引（7d）</li>
+                    <li class="table-cell">monitor_caiji_preprocess</li>
+                    <li class="table-cell-earliest-monitor_caiji_preprocess">-</li>
+                    <li class="table-cell-latest-monitor_caiji_preprocess">-</li>
+                </ul>
+                <ul class="table-row">
+                    <li class="table-cell">专题索引（7d）</li>
+                    <li class="table-cell">event_data</li>
+                    <li class="table-cell-earliest-event_data">-</li>
+                    <li class="table-cell-latest-event_data">-</li>
+                </ul>
+                <ul class="table-row">
+                    <li class="table-cell">预警索引（7d）</li>
+                    <li class="table-cell">monitor_data</li>
+                    <li class="table-cell-earliest-monitor_data">-</li>
+                    <li class="table-cell-latest-monitor_data">-</li>
+                </ul>
+                <ul class="table-row">
+                    <li class="table-cell">ZDR采集索引（7d）</li>
+                    <li class="table-cell">zdr_caiji</li>
+                    <li class="table-cell-earliest-zdr_caiji">-</li>
+                    <li class="table-cell-latest-zdr_caiji">-</li>
+                </ul>
+                <ul class="table-row">
+                    <li class="table-cell">ZDR预处理索引（3d）</li>
+                    <li class="table-cell">zdr_data</li>
+                    <li class="table-cell-earliest-zdr_data">-</li>
+                    <li class="table-cell-latest-zdr_data">-</li>
+                </ul>
+                <ul class="table-row">
+                    <li class="table-cell">用户信息索引（没有配置删除）</li>
+                    <li class="table-cell">common_caiji</li>
+                    <li class="table-cell-earliest-common_caiji">-</li>
+                    <li class="table-cell-latest-common_caiji">-</li>
+                </ul>
+                <ul class="table-row">
+                    <li class="table-cell">其它索引（没有配置删除）</li>
+                    <li class="table-cell">非核心索引类型</li>
+                    <li class="table-cell-earliest-other">-</li>
+                    <li class="table-cell-latest-other">-</li>
+                </ul>
+            </div>
+            <!--<div class="table-footer-group">-->
+            <!--<ul class="table-row">-->
+            <!--<li class="table-cell">footer</li>-->
+            <!--<li class="table-cell">footer</li>-->
+            <!--<li class="table-cell">footer</li>-->
+            <!--<li class="table-cell">footer</li>-->
+            <!--</ul>-->
+            <!--</div>-->
         </div>
-        <div id="layer04_right" class="layer04-panel">
-            <div id="layer04_right_label" class="layer04-panel-label">
-                <span>集群性能/</span><span style="color:#00A09A;">近一个小时</span>
-            </div>
-            <div id="layer04_right_chart" class="layer04-panel-chart" _echarts_instance_="ec_1575012415477"
-                 style="-webkit-tap-highlight-color: transparent; user-select: none; position: relative;">
-                <div style="position: relative; overflow: hidden; width: 492px; height: 195px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
-                    <canvas data-zr-dom-id="zr_0" width="492" height="195"
-                            style="position: absolute; left: 0px; top: 0px; width: 492px; height: 195px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
-                </div>
-                <div style="position: absolute; display: none; border-style: solid; white-space: nowrap; z-index: 9999999; transition: left 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0s, top 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0s; background-color: rgba(50, 50, 50, 0.7); border-width: 0px; border-color: rgb(51, 51, 51); border-radius: 4px; color: rgb(255, 255, 255); font: 14px/21px &quot;Microsoft YaHei&quot;; padding: 5px; left: 295px; top: 19px; pointer-events: none;">
-                    14:20<br><span
-                        style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#F3891B;"></span>网络:
-                    210<br><span
-                        style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#006AD4;"></span>内存:
-                    310<br><span
-                        style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#009895;"></span>CPU:
-                    410
-                </div>
-            </div>
-        </div>
+
+        <!--<div id="layer04_left" class="layer04-panel">-->
+        <!--<div id="layer04_left_label" class="layer04-panel-label">30天日均线流量趋势</div>-->
+        <!--<div id="layer04_left_chart" class="layer04-panel-chart" _echarts_instance_="ec_1575012415476"-->
+        <!--style="-webkit-tap-highlight-color: transparent; user-select: none; position: relative;">-->
+        <!--<div style="position: relative; overflow: hidden; width: 492px; height: 195px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">-->
+        <!--<canvas data-zr-dom-id="zr_0" width="492" height="195"-->
+        <!--style="position: absolute; left: 0px; top: 0px; width: 492px; height: 195px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>-->
+        <!--</div>-->
+        <!--<div></div>-->
+        <!--</div>-->
+        <!--</div>-->
+
+        <!--<div id="layer04_right" class="layer04-panel">-->
+        <!--<div id="layer04_right_label" class="layer04-panel-label">-->
+        <!--<span>集群性能/</span><span style="color:#00A09A;">近一个小时</span>-->
+        <!--</div>-->
+        <!--<div id="layer04_right_chart" class="layer04-panel-chart" _echarts_instance_="ec_1575012415477"-->
+        <!--style="-webkit-tap-highlight-color: transparent; user-select: none; position: relative;">-->
+        <!--<div style="position: relative; overflow: hidden; width: 492px; height: 195px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">-->
+        <!--<canvas data-zr-dom-id="zr_0" width="492" height="195"-->
+        <!--style="position: absolute; left: 0px; top: 0px; width: 492px; height: 195px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>-->
+        <!--</div>-->
+        <!--<div style="position: absolute; display: none; border-style: solid; white-space: nowrap; z-index: 9999999; transition: left 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0s, top 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0s; background-color: rgba(50, 50, 50, 0.7); border-width: 0px; border-color: rgb(51, 51, 51); border-radius: 4px; color: rgb(255, 255, 255); font: 14px/21px &quot;Microsoft YaHei&quot;; padding: 5px; left: 295px; top: 19px; pointer-events: none;">-->
+        <!--14:20<br><span-->
+        <!--style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#F3891B;"></span>网络:-->
+        <!--210<br><span-->
+        <!--style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#006AD4;"></span>内存:-->
+        <!--310<br><span-->
+        <!--style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#009895;"></span>CPU:-->
+        <!--410-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
     </div>
 </div>
-
-
 </body>
+<script>
+    // 1.查看监测统计数据
+    $('#alarm-statistics').click(function () {
+        retrieveDataToJsonOrPrintPost("alarm-statistics")
+    });
+
+    // 2.以邮件方式发送监测报告
+    $('#send-email').click(function () {
+        retrieveDataToJsonOrPrintPost("send-email")
+    });
+
+    // 3.查看集群所有索引列表
+    $('#get-all-indices').click(function () {
+        retrieveDataToJsonOrPrintPost("get-all-indices")
+    });
+
+    // 4.查看最近24小时各索引数据统计量
+    $('#24h-statistics').click(function () {
+        retrieveDataToJsonOrPrintPost("24h-statistics")
+    });
+
+    // 5.查看最近一周各索引数据统计量
+    $('#7d-statistics').click(function () {
+        retrieveDataToJsonOrPrintPost("7d-statistics")
+    });
+
+    // 6.集群删除任务巡查【包括最近24小时内运行过的删除任务和现在正在运行的删除任务】
+    $('#delete-statistics').click(function () {
+        retrieveDataToJsonOrPrintPost("delete-statistics")
+    });
+
+    // 7.查看正在运行的删除任务
+    $('#delete-statistics_view_all_delete_01').click(function () {
+        retrieveDataToJsonOrPrintPost("delete-statistics_view_all_delete_01")
+    });
+
+    // 8.查看最近24小时内运行过的删除任务【不包含正在运行的任务】
+    $('#delete-statistics_view_all_delete_02').click(function () {
+        retrieveDataToJsonOrPrintPost("delete-statistics_view_all_delete_02")
+    });
+
+    // 从GET接口获取数据并以JSON的方式呈现到页面
+    function retrieveDataToJsonOrPrintGet(interfaceUrl) {
+        alert("Please wait for a moment...");
+        $("#loading").show();
+        d3.json(interfaceUrl, function (error, json) {
+            if (error) {
+                return console.warn(error);
+            }
+            $("#loading").hide();
+            console.log(json);
+            $('#json-renderer').jsonViewer(json, {collapsed: false, withQuotes: true});
+        });
+    }
+
+    // 从POST接口获取数据并以JSON的方式呈现到页面
+    function retrieveDataToJsonOrPrintPost(interfaceUrl) {
+        var address = sessionStorage.getItem("esClusterAddress");
+        var obj = {};
+        obj.address = address;
+        var json = JSON.stringify(obj);
+        $("#loading").show();
+        $.ajax({
+            type: 'POST',
+            async: true,
+            url: interfaceUrl,
+            data: json,
+            contentType: "application/json",
+            success: function (data) {
+                $("#loading").hide();
+                console.log(data);
+
+                sessionStorage.setItem("temp-json-data", JSON.stringify(data));
+                console.log(sessionStorage.getItem("temp-json-data"));
+                // 使用JSON查看页面查看数据
+                window.location.href = "json";
+                // alert(JSON.stringify(data));
+                // $('#json-renderer').jsonViewer(data, {collapsed: false, withQuotes: true});
+            },
+            dataType: 'json'
+        });
+    }
+
+    // WHOLE PAGE LOADING
+    $("#loading").fadeOut(400);
+</script>
 </html>
+
 

@@ -1,0 +1,211 @@
+.table {
+    /*此元素会作为块级表格来显示（类似 <table>），表格前后带有换行符。*/
+    display: table;
+    /*border-collapse:collapse;*/
+    border-collapse: separate;
+    border: 1px solid #ccc;
+}
+
+.table-caption {
+    /*此元素会作为一个表格标题显示（类似 <caption>）*/
+    display: table-caption;
+    margin: 0;
+    font-size: 16px;
+    color: cyan;
+}
+
+.table-header-group {
+    /*此元素会作为一个或多个行的分组来显示（类似 <thead>）。*/
+    display: table-header-group;
+    background: #eee;
+    font-weight: bold;
+}
+
+.table-row-group {
+    /*此元素会作为一个或多个行的分组来显示（类似 <tbody>）。*/
+    display: table-row-group;
+}
+
+.table-footer-group {
+    /*此元素会作为一个或多个行的分组来显示（类似 <tfoot>）。*/
+    display: table-footer-group;
+}
+
+ul {
+    list-style: none;
+}
+
+.table-row {
+    /*此元素会作为一个表格行显示（类似 <tr>）。*/
+    display: table-row;
+}
+
+.table-cell {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-earliest-monitor_caiji_all {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-latest-monitor_caiji_all {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-earliest-monitor_caiji_small {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-latest-monitor_caiji_small {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-earliest-monitor_caiji_preprocess {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-latest-monitor_caiji_preprocess {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-earliest-event_data {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-latest-event_data {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-earliest-monitor_data {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-latest-monitor_data {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-earliest-zdr_caiji {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-latest-zdr_caiji {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-earliest-zdr_data {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-latest-zdr_data {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-earliest-common_caiji {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-latest-common_caiji {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-earliest-other {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-cell-latest-other {
+    /*此元素会作为一个表格单元格显示（类似 <td> 和 <th>）*/
+    display: table-cell;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    color: red;
+}
+
+.table-row-group .table-row:hover, .table-footer-group .table-row:hover {
+    background: #f6f6f6;
+    color: green;
+    font-weight: bold;
+}
+
+.table-column-group {
+    /*此元素会作为一个或多个列的分组来显示（类似 <colgroup>）。*/
+    display: table-column-group;
+}
+
+.table-column {
+    /*此元素会作为一个单元格列显示（类似 <col>）*/
+    display: table-column;
+    width: 280px;
+}
+

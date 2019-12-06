@@ -426,10 +426,13 @@ $(document).ready(
 
 function getAddress() {
     // 获取缓存的ES地址
-    $("#restEndPoint").val(sessionStorage.getItem("esClusterAddress"));
-    if ($("#restEndPoint").val() == "") {
+    var address = sessionStorage.getItem("esClusterAddress");
+    if (address == null || address == "") {
         $("#restEndPoint").val(location.protocol + "//" + location.hostname + ":9200");
+    } else {
+        $("#restEndPoint").val(sessionStorage.getItem("esClusterAddress"));
     }
+
     // 默认执行一次connect
     $('#connectButton').click();
 }

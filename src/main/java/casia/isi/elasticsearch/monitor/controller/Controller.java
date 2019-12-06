@@ -114,6 +114,17 @@ public class Controller {
     /**
      * @param
      * @return
+     * @Description: TODO(README) http://localhost:7100/toolkit/json
+     */
+    @RequestMapping(value = "/json", method = RequestMethod.GET)
+    public String json(ModelMap modelMap) {
+        modelMap.put("msg", "SpringBoot Elasticsearch Monitor Json");
+        return "elasticsearch_monitor/json";
+    }
+
+    /**
+     * @param
+     * @return
      * @Description: TODO(Monitor Instrument Bigdesk Index) http://localhost:7100/toolkit/bigdesk-index
      */
     @RequestMapping(value = "/bigdesk-index", method = RequestMethod.GET)
@@ -136,7 +147,7 @@ public class Controller {
         new HttpAccessor().removeLastHttpsAddNewAddress(userJson.getAddress());
 
         HttpRequest httpRequest = new HttpRequest();
-        boolean status = httpRequest.checkHttpGet(address);
+        boolean status = httpRequest.checkHttpGet(address.trim());
         return new Message().setStatus(status).toJSONString();
     }
 
@@ -240,6 +251,32 @@ public class Controller {
     /**
      * @param
      * @return
+     * @Description: TODO(DELETE STATISTICS 01)
+     */
+    @RequestMapping(value = "/delete-statistics_view_all_delete_01", method = RequestMethod.POST)
+    @ResponseBody
+    public String getDeleteStatistics01(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.clusterDeleteTask(userJson.getAddress()))
+                .toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(DELETE STATISTICS 02)
+     */
+    @RequestMapping(value = "/delete-statistics_view_all_delete_02", method = RequestMethod.POST)
+    @ResponseBody
+    public String getDeleteStatistics02(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.detectDeleter(userJson.getAddress()))
+                .toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
      * @Description: TODO(CLUSTER DELETE TASKS)
      */
     @RequestMapping(value = "/cluster-delete-task", method = RequestMethod.POST)
@@ -302,6 +339,31 @@ public class Controller {
                 .toJSONString();
     }
 
+    /**
+     * @param
+     * @return
+     * @Description: TODO(INDICES TIME INFORMATION)
+     */
+    @RequestMapping(value = "/indices-time-info", method = RequestMethod.POST)
+    @ResponseBody
+    public String getIndicesTimeInfo(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.getIndicesTimeInfo(userJson.getAddress()))
+                .toJSONString();
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(ABNORMAL DATA DESCRIPTION)
+     */
+    @RequestMapping(value = "/abnormal-data-description", method = RequestMethod.POST)
+    @ResponseBody
+    public String getAbnormalDataDescription(@RequestBody UserJson userJson) {
+        return new Message().setStatus(true)
+                .putResult(elasticStatistics.getAbnormalDataDescription(userJson.getAddress(),userJson.getIndexType()))
+                .toJSONString();
+    }
 }
 
 

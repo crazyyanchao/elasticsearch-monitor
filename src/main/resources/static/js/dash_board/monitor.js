@@ -53,26 +53,26 @@ function drawLegend(pointColor, pointY, text) {
 
 function renderLayer03Right() {
 
-    var address = sessionStorage.getItem("esClusterAddress");
-    var obj = {};
-    obj.address = address;
-    var json = JSON.stringify(obj);
-    $("#loading").show();
-    $.ajax({
-        type: 'POST',
-        async: true,
-        url: 'cluster-average-basis-info',
-        data: json,
-        contentType: "application/json",
-        success: function (data) {
-            var result = JSON.parse(data.result);
-            // 刷新圆形占比数据
-            drawLayer03Right($("#layer03_right_chart01 canvas").get(0), "#027825", result.cpu);
-            drawLayer03Right($("#layer03_right_chart02 canvas").get(0), "#006DD6", result.heap);
-            drawLayer03Right($("#layer03_right_chart03 canvas").get(0), "#238681", result.disk);
-        },
-        dataType: 'json'
-    });
+    // var address = sessionStorage.getItem("esClusterAddress");
+    // var obj = {};
+    // obj.address = address;
+    // var json = JSON.stringify(obj);
+    // $("#loading").show();
+    // $.ajax({
+    //     type: 'POST',
+    //     async: true,
+    //     url: 'cluster-average-basis-info',
+    //     data: json,
+    //     contentType: "application/json",
+    //     success: function (data) {
+    //         var result = JSON.parse(data.result);
+    //         // 刷新圆形占比数据
+    //         drawLayer03Right($("#layer03_right_chart01 canvas").get(0), "#027825", result.cpu);
+    //         drawLayer03Right($("#layer03_right_chart02 canvas").get(0), "#006DD6", result.heap);
+    //         drawLayer03Right($("#layer03_right_chart03 canvas").get(0), "#238681", result.disk);
+    //     },
+    //     dataType: 'json'
+    // });
 }
 
 function drawLayer03Right(canvasObj, colorValue, rate) {

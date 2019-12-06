@@ -18,7 +18,8 @@
     <link id="layuicss-skinlayercss" rel="stylesheet" href="path/css/login/layer.css" media="all">
     <link href="path/css/loading.css" rel="stylesheet">
 </head>
-<body style="background: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAJxCAYAAAAjN7CPAAADl0lEQVR4Xu3TBVIVUBxGcdkIiKSEiMADEcQnOKPYCEpIdzePfKTd3d2d+9NlHGbuuSs48/t/NyHxYOzfFvAlGKBA4qFZeITBByTRAnxA9Rw7wiQDFKieZ0e49bABCizAIzxiACyQTJ+ADzi6yP6CZAMUOLbEjnCbAQocj8MjNIAWSOEDltkRppwwQIEVeIQn4YBUA3iBVXaEqTUGhC6QVrPGjjDtlAEKrMMjrA09IJ0WMCC9doP9Bel1BoQukFF3jh1hxmkDFDgPj/BM6AGZtMAmCLjAjjCz3gAFLrIj3F5PBzQYgAtcgkfYQAc0hh6QRQtkNV5mR8gHNNECBjRdgUdIB2SfhQUM2AQCV9lfkN1sACyQQ58gp/kaO0I+oIUWMKDlOjxCOiC3FRYwILf1BjtCPqCNFgg+YEfbTXaEfEA7LWBA+y14hHhAByyQZ0DHbXaEeQZ00ifgA+6wI9zZGXxAFy1gQNdd+BfgAd2wQL4B3ffYEebjAT20gAE999kR7sIDemkBA3ofwCM0oA8+QQEf8JAdYUFf8AH9tAAf8AgeYT8cUIgHDNACfMBjdoSFA8EHDNICdEDR4BN2hAYUDdEnMGDoKfwL6IAIHjAMnyDCBzxjRxgZDj5ghBagA4pHnrMjNKB4lD4BH/ACHuFo6AElY7DAJgh4yY6wZMwAWmAcD3jFjnD3uAG0wAQe8Boe4YQBsEDpJB7whh1h6aQBtMCUAW/ZX7BnKviAaVqAD3gHj3DaAFigbAYPeM+OsGzGAFoghgd8gEcYgwPKDZilTzD7kR1huQG4wBy8gb1zn9gRGsALzNMbmP8MjzD4gApagA9Y+MKOsMIABRbhEe5b/Mr+AgN4gSV6A0vf4BEGHxClBaJxeAPR+Hd2hAbwAsv0BpZ/sCPcb4ACKz/hERpAC1TiAau/2BFWGqDA2m94hHRAlQG4wPofdoRVBgQvcGDjLztCAxRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUCB4gf+vcbAKwTH2PgAAAABJRU5ErkJggg==&quot;);">
+<body onload="checkAddress()"
+      style="background: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAJxCAYAAAAjN7CPAAADl0lEQVR4Xu3TBVIVUBxGcdkIiKSEiMADEcQnOKPYCEpIdzePfKTd3d2d+9NlHGbuuSs48/t/NyHxYOzfFvAlGKBA4qFZeITBByTRAnxA9Rw7wiQDFKieZ0e49bABCizAIzxiACyQTJ+ADzi6yP6CZAMUOLbEjnCbAQocj8MjNIAWSOEDltkRppwwQIEVeIQn4YBUA3iBVXaEqTUGhC6QVrPGjjDtlAEKrMMjrA09IJ0WMCC9doP9Bel1BoQukFF3jh1hxmkDFDgPj/BM6AGZtMAmCLjAjjCz3gAFLrIj3F5PBzQYgAtcgkfYQAc0hh6QRQtkNV5mR8gHNNECBjRdgUdIB2SfhQUM2AQCV9lfkN1sACyQQ58gp/kaO0I+oIUWMKDlOjxCOiC3FRYwILf1BjtCPqCNFgg+YEfbTXaEfEA7LWBA+y14hHhAByyQZ0DHbXaEeQZ00ifgA+6wI9zZGXxAFy1gQNdd+BfgAd2wQL4B3ffYEebjAT20gAE999kR7sIDemkBA3ofwCM0oA8+QQEf8JAdYUFf8AH9tAAf8AgeYT8cUIgHDNACfMBjdoSFA8EHDNICdEDR4BN2hAYUDdEnMGDoKfwL6IAIHjAMnyDCBzxjRxgZDj5ghBagA4pHnrMjNKB4lD4BH/ACHuFo6AElY7DAJgh4yY6wZMwAWmAcD3jFjnD3uAG0wAQe8Boe4YQBsEDpJB7whh1h6aQBtMCUAW/ZX7BnKviAaVqAD3gHj3DaAFigbAYPeM+OsGzGAFoghgd8gEcYgwPKDZilTzD7kR1huQG4wBy8gb1zn9gRGsALzNMbmP8MjzD4gApagA9Y+MKOsMIABRbhEe5b/Mr+AgN4gSV6A0vf4BEGHxClBaJxeAPR+Hd2hAbwAsv0BpZ/sCPcb4ACKz/hERpAC1TiAau/2BFWGqDA2m94hHRAlQG4wPofdoRVBgQvcGDjLztCAxRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUEABBRRQQAEFFFBAAQUUUCB4gf+vcbAKwTH2PgAAAABJRU5ErkJggg==&quot;);">
 <div class="login">
     <div class="login_title">
         <span>ELASTICSEARCH HOSTS</span>
@@ -72,6 +73,16 @@
 <script src="path/js/login/jquery.mockjax.js" type="text/javascript"></script>
 <script type="text/javascript">
 
+    function checkAddress() {
+        // 获取缓存的ES地址
+        var address = sessionStorage.getItem("esClusterAddress");
+        if (address == null || address == "") {
+            $("#es-address").val(location.protocol + "//" + location.hostname + ":9200");
+        } else {
+            $("#es-address").val(sessionStorage.getItem("esClusterAddress"));
+        }
+    }
+
     $(function () {
         input();
     });
@@ -86,6 +97,12 @@
                 var json = JSON.stringify(obj);
 
                 // 全局访问地址保存
+                var char = address.substring(address.length - 1, address.length);
+                if ('/' == char) {
+                    address = address.substring(0, address.length - 1);
+                }
+
+                sessionStorage.clear();
                 sessionStorage.setItem("esClusterAddress", address);
 
                 $("#loading").show();
@@ -180,25 +197,9 @@
 <script id="vs" type="x-shader/x-vertex">
     varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }
 
-
-
-
-
-
-
-
-
 </script>
 <script id="fs" type="x-shader/x-fragment">
 			uniform sampler2D map; uniform vec3 fogColor; uniform float fogNear; uniform float fogFar; varying vec2 vUv; void main() { float depth = gl_FragCoord.z / gl_FragCoord.w; float fogFactor = smoothstep( fogNear, fogFar, depth ); gl_FragColor = texture2D( map, vUv ); gl_FragColor.w *= pow( gl_FragCoord.z, 20.0 ); gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor ); }
-
-
-
-
-
-
-
-
 
 </script>
 <script type="text/javascript">

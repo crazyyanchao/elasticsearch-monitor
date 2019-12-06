@@ -23,8 +23,11 @@ package casia.isi.elasticsearch.monitor.common;
  * 　　　　　　　　　 ┗┻┛　 ┗┻┛+ + + +
  */
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
+import java.util.Map;
 
 /**
  * @author YanchaoMa yanchaoma@foxmail.com
@@ -47,6 +50,13 @@ public class Message {
         return this;
     }
 
+    public Message putResult(Map map) {
+        JSONObject result = JSONObject.parseObject(JSON.toJSONString(map));
+        this.object.put("result", result);
+        this.object.put("count", result.size());
+        return this;
+    }
+
     public Message putResult(String result) {
         this.object.put("result", result);
         this.object.put("length", result.length());
@@ -62,4 +72,6 @@ public class Message {
     public String toJSONString() {
         return this.object.toJSONString();
     }
+
 }
+
