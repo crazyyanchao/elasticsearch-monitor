@@ -503,9 +503,14 @@ public class ElasticStatistics {
         EsIndexSearch esIndexSearch = new EsIndexSearch(address, indexName, indexType);
         esIndexSearch.addSortField(timeFiled, sort);
         esIndexSearch.setRow(1);
-        esIndexSearch.execute(new String[]{timeFiled,"it","gid"});
+        esIndexSearch.execute(new String[]{timeFiled, "it", "gid"});
         JSONObject jsonObject = JSONObject.parseObject(esIndexSearch.queryJsonResult.toJSONString());
         esIndexSearch.reset();
+
+        JSONObject search = new JSONObject();
+        search.put("queryUrl", esIndexSearch.queryUrl);
+        search.put("query", esIndexSearch.queryJson);
+        jsonObject.put("search", search);
         return jsonObject;
     }
 

@@ -24,11 +24,19 @@
     <div class="loadingImage"></div>
 </div>
 
+<div>
+    <a href="javascript:void(0)" style="color: rgba(212,11,7,0.89); font-size: 16px;" onclick="backDashDoard()">回到仪表盘</a>
+</div>
+
 <div id="json-renderer"
      style="position: relative; color: rgba(15,1,3,0.89);display:  inline-block;position:  initial;width:  766px;right: 401px;top: 280px;height: auto;">
 </div>
 
 <script>
+
+    function backDashDoard() {
+        window.location.href = "dash_board";
+    }
 
     function checkJson() {
         var data = JSON.parse(sessionStorage.getItem("temp-json-data"));

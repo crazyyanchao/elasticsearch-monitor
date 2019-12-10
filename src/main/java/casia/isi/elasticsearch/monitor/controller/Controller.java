@@ -23,7 +23,6 @@ package casia.isi.elasticsearch.monitor.controller;
  * 　　　　　　　　　 ┗┻┛　 ┗┻┛+ + + +
  */
 
-import casia.isi.elasticsearch.common.EsAccessor;
 import casia.isi.elasticsearch.monitor.common.HttpAccessor;
 import casia.isi.elasticsearch.monitor.entity.UserJson;
 import casia.isi.elasticsearch.monitor.service.ElasticStatistics;
