@@ -2,6 +2,7 @@ package casia.isi.elasticsearch.monitor.service;
 
 import casia.isi.elasticsearch.monitor.common.SysConstant;
 import casia.isi.elasticsearch.monitor.entity.MailBean;
+import casia.isi.elasticsearch.operation.http.HttpProxyRegister;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,11 +41,14 @@ class ElasticStatisticsTest {
     private ElasticStatistics elastic;
     private MailService mailService;
 
+    private String address="http://39.97.167.206:9210";
+
     @BeforeEach
     void setUp() {
         PropertyConfigurator.configureAndWatch("config/log4j.properties");
         elastic = new ElasticStatistics();
         mailService = new MailService();
+        HttpProxyRegister.register(address);
     }
 
     @Test
@@ -58,5 +62,25 @@ class ElasticStatisticsTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    void getTotal() {
+        System.out.println(elastic.getTotal(address,"common_caiji"));
+    }
+
+    @Test
+    void calPorportion() {
+        System.out.println(elastic.calPorportion(address,232334212));
+    }
+
+    @Test
+    void wholeIndexKpi() {
+        elastic.wholeIndexKpi(address);
+    }
+
+    @Test
+    void getHTMLInStatisticsString() {
+        System.out.println(elastic.getHTMLInStatistics(address));
     }
 }

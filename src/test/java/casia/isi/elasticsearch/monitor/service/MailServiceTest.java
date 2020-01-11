@@ -2,7 +2,6 @@ package casia.isi.elasticsearch.monitor.service;
 
 import casia.isi.elasticsearch.monitor.common.SysConstant;
 import casia.isi.elasticsearch.monitor.entity.MailBean;
-import casia.isi.elasticsearch.util.FileUtil;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +43,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 class MailServiceTest {
 
+    private String address = "http://39.97.167.206:9210";
+
     @Autowired
     private MailService mailService;
 
@@ -67,13 +68,14 @@ class MailServiceTest {
             e.printStackTrace();
         }
     }
+
     @Test
     void sendMailHtml() {
         MailBean mailBean = new MailBean();
         mailBean.setReceiver(SysConstant.EMAIL_RECEIVER);
         mailBean.setSubject("[Daily Report]-CASIA AliYun Elasticsearch Monitor");
-        String html= FileUtil.readAllLine("config/statistics.html","UTF-8");
-        mailBean.setContent(html); // 后台定时任务监控预警配置的集群
+//        String html= FileUtil.readAllLine("config/statistics.html","UTF-8");
+        mailBean.setContent(elastic.getHTMLInStatistics(address)); // 后台定时任务监控预警配置的集群
         try {
             mailService.sendMailHtml(mailBean);
         } catch (Exception e) {

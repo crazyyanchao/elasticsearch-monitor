@@ -95,7 +95,7 @@ public class ScheduledTask {
         // 1、集群所有索引数据量按日统计；2、集群预警的一些基本信息；
         statisticsTask();
         // 生成数据报告HTML
-//        statisticsHTMLTask();
+        statisticsHTMLTask();
     }
 
 //    // TASK RECORD任务

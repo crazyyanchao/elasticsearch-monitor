@@ -30,23 +30,36 @@ package casia.isi.elasticsearch.monitor.model;
  * @date 2020/1/11 10:36
  */
 public class WholeIndexKpi {
-    // 索引类型名
-    private String indexType;
     // 别名
     private String alias;
-    // 数据量
+    // 索引类型名
+    private String indexType;
+    // 数据总量
     private int total;
     // 占比
-    private float proportion;
+    private String proportion;
+
+    // 昨日数据量
+    private int yesterdayDataCount;
+    // 今日数据量
+    private int todayDataCount;
+    // 最早一条数据时间
+    private String earliestTime;
+    // 最近一条数据时间
+    private String latestTime;
 
     public WholeIndexKpi() {
     }
 
-    public WholeIndexKpi(String indexType, String alias, int total, float proportion) {
+    public WholeIndexKpi(String indexType, String alias, int total, String proportion, int yesterdayDataCount, int todayDataCount, String earliestTime, String latestTime) {
         this.indexType = indexType;
         this.alias = alias;
         this.total = total;
         this.proportion = proportion;
+        this.yesterdayDataCount = yesterdayDataCount;
+        this.todayDataCount = todayDataCount;
+        this.earliestTime = earliestTime;
+        this.latestTime = latestTime;
     }
 
     public String getIndexType() {
@@ -73,12 +86,44 @@ public class WholeIndexKpi {
         this.total = total;
     }
 
-    public float getProportion() {
+    public String getProportion() {
         return proportion;
     }
 
-    public void setProportion(float proportion) {
+    public void setProportion(String proportion) {
         this.proportion = proportion;
+    }
+
+    public int getYesterdayDataCount() {
+        return yesterdayDataCount;
+    }
+
+    public void setYesterdayDataCount(int yesterdayDataCount) {
+        this.yesterdayDataCount = yesterdayDataCount;
+    }
+
+    public int getTodayDataCount() {
+        return todayDataCount;
+    }
+
+    public void setTodayDataCount(int todayDataCount) {
+        this.todayDataCount = todayDataCount;
+    }
+
+    public String getEarliestTime() {
+        return earliestTime;
+    }
+
+    public void setEarliestTime(String earliestTime) {
+        this.earliestTime = earliestTime;
+    }
+
+    public String getLatestTime() {
+        return latestTime;
+    }
+
+    public void setLatestTime(String latestTime) {
+        this.latestTime = latestTime;
     }
 }
 

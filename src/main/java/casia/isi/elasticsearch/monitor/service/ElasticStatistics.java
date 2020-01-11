@@ -30,7 +30,11 @@ import casia.isi.elasticsearch.monitor.common.EsUrl;
 import casia.isi.elasticsearch.monitor.common.HttpAccessor;
 import casia.isi.elasticsearch.monitor.common.SysConstant;
 import casia.isi.elasticsearch.monitor.common.TaskAction;
+import casia.isi.elasticsearch.monitor.model.DeleteTaskKpi;
 import casia.isi.elasticsearch.monitor.model.GlobalIndexKpi;
+import casia.isi.elasticsearch.monitor.model.SingleIndexKpi;
+import casia.isi.elasticsearch.monitor.model.WholeIndexKpi;
+import casia.isi.elasticsearch.monitor.util.HTMLUtil;
 import casia.isi.elasticsearch.operation.search.EsIndexSearch;
 import casia.isi.elasticsearch.util.ClientUtils;
 import casia.isi.elasticsearch.util.DateUtil;
@@ -40,10 +44,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.text.NumberFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -213,7 +215,6 @@ public class ElasticStatistics {
      */
     public JSONObject getAllIndices(String address) {
         // 先重置集群地址
-
         httpAccessor.removeLastHttpsAddNewAddress(address);
 
         String queryResult = httpAccessor.request.httpGet(ClientUtils.referenceUrl(EsUrl._mapping.url()));
@@ -412,25 +413,7 @@ public class ElasticStatistics {
      * @Description: TODO(集群访问地址)
      */
     public JSONObject getAbnormalDataDescription(String address, String indexType) {
-        Map<String, String> mapMap = new HashMap<>();
-        mapMap.put("monitor_caiji_all",
-                "think_tank_all,video_info_all,forum_threads_all,instagram_thread_all,twitter_info_all,youtube_info_all,facebook_info_all,mblog_info_all,wechat_info_all,appdata_all,newspaper_all,news_all,blog_all,platform_info_all");
-        mapMap.put("monitor_caiji_small",
-                "think_tank_small,video_info_small,forum_threads_small,instagram_thread_small,twitter_info_small,youtube_info_small,facebook_info_small,mblog_info_small,wechat_info_small,appdata_small,newspaper_small,news_small,blog_small,platform_info_small");
-        mapMap.put("monitor_caiji_preprocess",
-                "video_info_preprocess,forum_threads_preprocess,instagram_thread_preprocess,twitter_info_preprocess,youtube_info_preprocess,facebook_info_preprocess,mblog_info_preprocess,wechat_info_preprocess,appdata_preprocess,newspaper_preprocess,news_preprocess,blog_preprocess,platform_info_preprocess");
-        mapMap.put("event_data",
-                "event_appdata_ref_event,event_blog_ref_event,event_facebook_info_ref_event,event_forum_threads_ref_event,event_instagram_thread_ref_event,event_mblog_info_ref_event,event_news_ref_event,event_newspaper_ref_event,event_platform_info_ref_event,event_twitter_info_ref_event,event_video_info_ref_event,event_wechat_info_ref_event,event_youtube_info_ref_event");
-        mapMap.put("monitor_data",
-                "event_appdata_ref_monitor,event_blog_ref_monitor,event_facebook_info_ref_monitor,event_forum_threads_ref_monitor,event_instagram_thread_ref_monitor,event_mblog_info_ref_monitor,event_news_ref_monitor,event_newspaper_ref_monitor,event_platform_info_ref_monitor,event_twitter_info_ref_monitor,event_video_info_ref_monitor,event_wechat_info_ref_monitor,event_youtube_info_ref_monitor");
-        mapMap.put("zdr_caiji",
-                "blog_comment_zdr,facebook_comment_zdr,forum_replys_zdr,instagram_comment_zdr,mblog_comment_zdr,twitter_comment_zdr,wechat_comment_zdr,youtube_comment_zdr");
-        mapMap.put("zdr_data",
-                "user_forum_threads_ref_zdr,user_instagram_thread_ref_zdr,user_twitter_info_ref_zdr,user_youtube_info_ref_zdr,user_facebook_info_ref_zdr,user_mblog_info_ref_zdr,user_wechat_info_ref_zdr,user_blog_ref_zdr,user_linkedin_thread_ref_zdr");
-        mapMap.put("common_caiji",
-                "bloggers,facebook_users,forum_users,instagram_users,interlocution_users,linkedin_users,mblog_userinfo,platform_users,twitter_users,video_users,wechat_users,youtube_users");
-
-        String indexNames = mapMap.get(indexType);
+        String indexNames = getIndicesByType(indexType);
 
         JSONObject stringMapMap = new JSONObject();
         if ("common_caiji".equals(indexType)) {
@@ -452,24 +435,24 @@ public class ElasticStatistics {
      * @return
      * @Description: TODO(集群访问地址)
      */
-    public Map getIndicesTimeInfo(String address) {
+    public Map<String, Map<String, String>> getIndicesTimeInfo(String address) {
         Map<String, Map<String, String>> mapMap = new HashMap<>();
-        mapMap.put("monitor_caiji_all", getIndicesTimeMap(address,
-                "think_tank_all,video_info_all,forum_threads_all,instagram_thread_all,twitter_info_all,youtube_info_all,facebook_info_all,mblog_info_all,wechat_info_all,appdata_all,newspaper_all,news_all,blog_all,platform_info_all", "monitor_caiji_all", "pubtime"));
-        mapMap.put("monitor_caiji_small", getIndicesTimeMap(address,
-                "think_tank_small,video_info_small,forum_threads_small,instagram_thread_small,twitter_info_small,youtube_info_small,facebook_info_small,mblog_info_small,wechat_info_small,appdata_small,newspaper_small,news_small,blog_small,platform_info_small", "monitor_caiji_small", "pubtime"));
-        mapMap.put("monitor_caiji_preprocess", getIndicesTimeMap(address,
-                "video_info_preprocess,forum_threads_preprocess,instagram_thread_preprocess,twitter_info_preprocess,youtube_info_preprocess,facebook_info_preprocess,mblog_info_preprocess,wechat_info_preprocess,appdata_preprocess,newspaper_preprocess,news_preprocess,blog_preprocess,platform_info_preprocess", "monitor_caiji_preprocess", "pubtime"));
-        mapMap.put("event_data", getIndicesTimeMap(address,
-                "event_appdata_ref_event,event_blog_ref_event,event_facebook_info_ref_event,event_forum_threads_ref_event,event_instagram_thread_ref_event,event_mblog_info_ref_event,event_news_ref_event,event_newspaper_ref_event,event_platform_info_ref_event,event_twitter_info_ref_event,event_video_info_ref_event,event_wechat_info_ref_event,event_youtube_info_ref_event", "event_data", "pubtime"));
-        mapMap.put("monitor_data", getIndicesTimeMap(address,
-                "event_appdata_ref_monitor,event_blog_ref_monitor,event_facebook_info_ref_monitor,event_forum_threads_ref_monitor,event_instagram_thread_ref_monitor,event_mblog_info_ref_monitor,event_news_ref_monitor,event_newspaper_ref_monitor,event_platform_info_ref_monitor,event_twitter_info_ref_monitor,event_video_info_ref_monitor,event_wechat_info_ref_monitor,event_youtube_info_ref_monitor", "monitor_data", "pubtime"));
-        mapMap.put("zdr_caiji", getIndicesTimeMap(address,
-                "blog_comment_zdr,facebook_comment_zdr,forum_replys_zdr,instagram_comment_zdr,mblog_comment_zdr,twitter_comment_zdr,wechat_comment_zdr,youtube_comment_zdr", "zdr_caiji", "pubtime"));
-        mapMap.put("zdr_data", getIndicesTimeMap(address,
-                "user_forum_threads_ref_zdr,user_instagram_thread_ref_zdr,user_twitter_info_ref_zdr,user_youtube_info_ref_zdr,user_facebook_info_ref_zdr,user_mblog_info_ref_zdr,user_wechat_info_ref_zdr,user_blog_ref_zdr,user_linkedin_thread_ref_zdr", "zdr_data", "pubtime"));
-        mapMap.put("common_caiji", getIndicesTimeMap(address,
-                "bloggers,facebook_users,forum_users,instagram_users,interlocution_users,linkedin_users,mblog_userinfo,platform_users,twitter_users,video_users,wechat_users,youtube_users", "common_caiji", "insert_time"));
+        mapMap.put("monitor_caiji_all", getIndicesTimeMap(address, getIndicesByType("monitor_caiji_all")
+                , "monitor_caiji_all", "pubtime"));
+        mapMap.put("monitor_caiji_small", getIndicesTimeMap(address, getIndicesByType("monitor_caiji_small")
+                , "monitor_caiji_small", "pubtime"));
+        mapMap.put("monitor_caiji_preprocess", getIndicesTimeMap(address, getIndicesByType("monitor_caiji_preprocess")
+                , "monitor_caiji_preprocess", "pubtime"));
+        mapMap.put("event_data", getIndicesTimeMap(address, getIndicesByType("event_data")
+                , "event_data", "pubtime"));
+        mapMap.put("monitor_data", getIndicesTimeMap(address, getIndicesByType("monitor_data")
+                , "monitor_data", "pubtime"));
+        mapMap.put("zdr_caiji", getIndicesTimeMap(address, getIndicesByType("zdr_caiji")
+                , "zdr_caiji", "pubtime"));
+        mapMap.put("zdr_data", getIndicesTimeMap(address, getIndicesByType("zdr_data")
+                , "zdr_data", "pubtime"));
+        mapMap.put("common_caiji", getIndicesTimeMap(address, getIndicesByType("common_caiji")
+                , "common_caiji", "insert_time"));
         return mapMap;
     }
 
@@ -521,16 +504,146 @@ public class ElasticStatistics {
      * @Description: TODO(获取HTML的统计数据)
      */
     public String getHTMLInStatistics(String address) {
-//        httpAccessor.removeLastHttpsAddNewAddress(address);
-//        GlobalIndexKpi globalIndexKpi = globalKpi(address);
+        httpAccessor.removeLastHttpsAddNewAddress(address);
         // KPI生成HTML
-        StringBuilder builder = new StringBuilder();
-        String html = FileUtil.readAllLine("config/statistics.html", "UTF-8");
-        builder.append(html);
-        return builder.toString();
+        String globalIndexKpi = HTMLUtil.globalIndexKpi(globalKpi(address));
+        String wholeIndexKpi = HTMLUtil.wholeIndexKpi(wholeIndexKpi(address));
+        String singleIndexKpi = HTMLUtil.singleIndexKpi(singleIndexKpi(address));
+        String deleteTaskKpi = HTMLUtil.deleteTaskKpi(deleteTaskKpi(address));
+
+        String html = HTMLUtil.getStatisticsHtml()
+                .replace("★★★globalIndexKpi★★★", globalIndexKpi)
+                .replace("★★★wholeIndexKpi★★★", wholeIndexKpi)
+                .replace("★★★singleIndexKpi★★★", singleIndexKpi)
+                .replace("★★★deleteTaskKpi★★★", deleteTaskKpi);
+        return html;
+    }
+
+    public List<DeleteTaskKpi> deleteTaskKpi(String address) {
+        httpAccessor.removeLastHttpsAddNewAddress(address);
+        List<DeleteTaskKpi> deleteTaskKpiList = new ArrayList<>();
+        JSONObject object = recentDoneDeleteTask(address);
+        for (String key : object.keySet()) {
+
+            String deleteTaskName = key;
+            JSONObject obj = object.getJSONObject(key);
+            int count = obj.getIntValue("count");
+            boolean isCompleted = obj.getBooleanValue("completed");
+            boolean isCancellable = obj.getBooleanValue("cancellable");
+            String locNode = obj.getString("node");
+            String taskID = obj.getString("lastTaskId");
+            String start_time = obj.getString("start_time");
+            long running_time_in_nanos = obj.getLongValue("running_time_in_nanos");
+            deleteTaskKpiList.add(new DeleteTaskKpi(deleteTaskName, count, isCompleted, isCancellable, locNode, taskID, start_time, running_time_in_nanos));
+        }
+        return deleteTaskKpiList;
+    }
+
+    public List<SingleIndexKpi> singleIndexKpi(String address) {
+        httpAccessor.removeLastHttpsAddNewAddress(address);
+        List<SingleIndexKpi> singleIndexKpiList = new ArrayList<>();
+        JSONObject mapping = getAllIndices(address);
+        for (Map.Entry entry : mapping.entrySet()) {
+            String indexName = String.valueOf(entry.getKey());
+            String indexType = String.valueOf(entry.getValue());
+
+            int total = getTotal(address, indexName);
+
+            String time = DateUtil.millToTimeStr(System.currentTimeMillis()).split(" ")[0] + " 00:00:00";
+            int yesterdayDataCount = getDataCountMap(address, indexType, indexName, DateUtil.dateSub(time, 86_400_000), time);
+            int todayDataCount = getDataCountMap(address, indexType, indexName, time, DateUtil.millToTimeStr(System.currentTimeMillis()));
+            String earliestTime;
+            String latestTime;
+            if ("common_caiji".equals(indexType)) {
+                Map<String, String> map = getIndicesTimeMap(address, indexName, indexType, "insert_time");
+                // EARLIEST
+                earliestTime = map.get("earliest");
+                // LATEST
+                latestTime = map.get("latest");
+            } else {
+                Map<String, String> map = getIndicesTimeMap(address, indexName, indexType, "pubtime");
+                // EARLIEST
+                earliestTime = map.get("earliest");
+                // LATEST
+                latestTime = map.get("latest");
+            }
+            singleIndexKpiList.add(new SingleIndexKpi(indexType, indexName, total, yesterdayDataCount, todayDataCount, earliestTime, latestTime));
+        }
+        return singleIndexKpiList;
+    }
+
+    public List<WholeIndexKpi> wholeIndexKpi(String address) {
+        httpAccessor.removeLastHttpsAddNewAddress(address);
+        List<WholeIndexKpi> wholeIndexKpiList = new ArrayList<>();
+        Map<String, Map<String, String>> mapMap = getIndicesTimeInfo(address);
+        for (String key : mapMap.keySet()) {
+            String indexType = key;
+            String alias = getAlias(key);
+            Map<String, String> timeMap = mapMap.get(key);
+            String earliestTime = timeMap.get("earliest");
+            String latestTime = timeMap.get("latest");
+
+            int total = getTotal(address, getIndicesByType(indexType));
+            String proportion = calPorportion(address, total);
+            String time = DateUtil.millToTimeStr(System.currentTimeMillis()).split(" ")[0] + " 00:00:00";
+            int yesterdayDataCount = getDataCountMap(address, indexType, getIndicesByType(indexType), DateUtil.dateSub(time, 86_400_000), time);
+            int todayDataCount = getDataCountMap(address, indexType, getIndicesByType(indexType), time, DateUtil.millToTimeStr(System.currentTimeMillis()));
+
+            wholeIndexKpiList.add(new WholeIndexKpi(indexType, alias, total, proportion, yesterdayDataCount, todayDataCount, earliestTime, latestTime));
+        }
+        return wholeIndexKpiList;
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(与集群所有索引数据量求比例)
+     */
+    public String calPorportion(String address, int total) {
+        JSONObject object = JSONObject.parseObject(getClusterBasisInfo(address));
+        int docs = object.getIntValue("docs");
+        NumberFormat numberFormat = NumberFormat.getInstance();
+        numberFormat.setMaximumFractionDigits(2);
+        String result = numberFormat.format((float) total / (float) docs * 100);
+        return result + "%";
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(索引数据量总和)
+     */
+    public int getTotal(String address, String indices) {
+        httpAccessor.removeLastHttpsAddNewAddress(address);
+        String info = httpAccessor.catIndicesInfo(indices, "docs.count");
+        JSONArray object = JSONArray.parseArray(info);
+        int count = 0;
+        for (Object obj : object) {
+            JSONObject jsonObject = (JSONObject) obj;
+            count += jsonObject.getIntValue("docs.count");
+        }
+        return count;
+    }
+
+    public int getDataCountMap(String address, String indexType, String indexName, String startTime, String stopTime) {
+        EsIndexSearch esIndexSearch = new EsIndexSearch(address, indexName, indexType);
+        httpAccessor.removeLastHttpsAddNewAddress(address);
+        esIndexSearch.addRangeTerms(SysConstant.ELASTICSEARCH_TIME_FIELD, startTime, stopTime);
+        List<String[]> result = esIndexSearch.facetDate(SysConstant.ELASTICSEARCH_TIME_FIELD, "yyyy-MM-dd", "1d");
+        JSONArray array = new JSONArray();
+        if (result == null || result.isEmpty()) {
+            array.add(packStatistics(indexName, indexType, stopTime.split(" ")[0], 0));
+        } else {
+            for (String[] infos : result) {
+                array.add(packStatistics(indexName, indexType, infos[0], Integer.parseInt(infos[1])));
+            }
+        }
+        esIndexSearch.reset();
+        return array.getJSONObject(0).getIntValue("count");
     }
 
     private GlobalIndexKpi globalKpi(String address) {
+        httpAccessor.removeLastHttpsAddNewAddress(address);
         String info = getClusterBasisInfo(address);
         JSONObject object = JSONObject.parseObject(info);
         String clusterName = object.getString("cluster_name_status");
@@ -544,6 +657,36 @@ public class ElasticStatistics {
         return new GlobalIndexKpi(clusterName, total, store, shardsCount, nodeCount, indicesCount, deleteTaskCount);
     }
 
+    private String getAlias(String key) {
+        Map<String, String> map = new HashMap<>();
+        map.put("monitor_caiji_all", "大索引");
+        map.put("monitor_caiji_small", "小索引");
+        map.put("monitor_caiji_preprocess", "预处理索引");
+        map.put("event_data", "专题索引");
+        map.put("monitor_data", "预警索引");
+        map.put("zdr_caiji", "ZDR采集索引");
+        map.put("zdr_data", "ZDR预处理索引");
+        map.put("common_caiji", "用户信息索引");
+        map.put("其它索引", "非核心索引类型");
+        String alias = map.get(key);
+        if (alias == null || "".equals(alias)) return "非核心索引类型";
+        return map.get(key);
+    }
+
+    private String getIndicesByType(String indexType) {
+        Map<String, String> map = new HashMap<>();
+        map.put("monitor_caiji_all", "think_tank_all,video_info_all,forum_threads_all,instagram_thread_all,twitter_info_all,youtube_info_all,facebook_info_all,mblog_info_all,wechat_info_all,appdata_all,newspaper_all,news_all,blog_all,platform_info_all");
+        map.put("monitor_caiji_small", "think_tank_small,video_info_small,forum_threads_small,instagram_thread_small,twitter_info_small,youtube_info_small,facebook_info_small,mblog_info_small,wechat_info_small,appdata_small,newspaper_small,news_small,blog_small,platform_info_small");
+        map.put("monitor_caiji_preprocess", "video_info_preprocess,forum_threads_preprocess,instagram_thread_preprocess,twitter_info_preprocess,youtube_info_preprocess,facebook_info_preprocess,mblog_info_preprocess,wechat_info_preprocess,appdata_preprocess,newspaper_preprocess,news_preprocess,blog_preprocess,platform_info_preprocess");
+        map.put("event_data", "event_appdata_ref_event,event_blog_ref_event,event_facebook_info_ref_event,event_forum_threads_ref_event,event_instagram_thread_ref_event,event_mblog_info_ref_event,event_news_ref_event,event_newspaper_ref_event,event_platform_info_ref_event,event_twitter_info_ref_event,event_video_info_ref_event,event_wechat_info_ref_event,event_youtube_info_ref_event");
+        map.put("monitor_data", "event_appdata_ref_monitor,event_blog_ref_monitor,event_facebook_info_ref_monitor,event_forum_threads_ref_monitor,event_instagram_thread_ref_monitor,event_mblog_info_ref_monitor,event_news_ref_monitor,event_newspaper_ref_monitor,event_platform_info_ref_monitor,event_twitter_info_ref_monitor,event_video_info_ref_monitor,event_wechat_info_ref_monitor,event_youtube_info_ref_monitor");
+        map.put("zdr_caiji", "blog_comment_zdr,facebook_comment_zdr,forum_replys_zdr,instagram_comment_zdr,mblog_comment_zdr,twitter_comment_zdr,wechat_comment_zdr,youtube_comment_zdr");
+        map.put("zdr_data", "user_forum_threads_ref_zdr,user_instagram_thread_ref_zdr,user_twitter_info_ref_zdr,user_youtube_info_ref_zdr,user_facebook_info_ref_zdr,user_mblog_info_ref_zdr,user_wechat_info_ref_zdr,user_blog_ref_zdr,user_linkedin_thread_ref_zdr");
+        map.put("common_caiji", "bloggers,facebook_users,forum_users,instagram_users,interlocution_users,linkedin_users,mblog_userinfo,platform_users,twitter_users,video_users,wechat_users,youtube_users");
+        String indices = map.get(indexType);
+        if (indices == null || "".equals(indices)) return "*";
+        return map.get(indexType);
+    }
 }
 
 
