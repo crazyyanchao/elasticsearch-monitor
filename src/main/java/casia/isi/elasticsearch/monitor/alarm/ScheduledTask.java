@@ -92,8 +92,10 @@ public class ScheduledTask {
     @Scheduled(cron = "0 00 05 * * ?") // 每天凌晨5点触发
 //    @Scheduled(fixedRate = 5000) // 每5秒执行一次
     public void scheduledTaskByCorn() {
-        // 1、集群所有索引数据量按日统计；2、集群预警的一些基本信息
+        // 1、集群所有索引数据量按日统计；2、集群预警的一些基本信息；
         statisticsTask();
+        // 生成数据报告HTML
+//        statisticsHTMLTask();
     }
 
 //    // TASK RECORD任务
@@ -134,6 +136,17 @@ public class ScheduledTask {
         }
     }
 
+    private void statisticsHTMLTask() {
+        MailBean mailBean = new MailBean();
+        mailBean.setReceiver(SysConstant.EMAIL_RECEIVER);
+        mailBean.setSubject("[Elasticsearch Daily Report]-DX AliYun");
+        mailBean.setContent(elastic.getHTMLInStatistics(SysConstant.ELASTICSEARCH_ADDRESS)); // 后台定时任务监控预警配置的集群
+        try {
+            mailService.sendMailHtml(mailBean);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * @param
      * @return

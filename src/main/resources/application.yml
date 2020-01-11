@@ -44,4 +44,31 @@ spring:
           socketFactory:
             class: javax.net.ssl.SSLSocketFactory
 
+#    host: smtp.126.com
+#    #    host: smtp.163.com
+#    #    username: 18511085575@163.com
+#    #    password: alarm123456bili
+#    #    username: yanchaomastandby@foxmail.com
+#    #    password: alarm123456bili
+#    #    username: 18306843748@163.com
+#    #    password: w695452594
+#    username: yanchaomastandby@126.com
+#    password: alarm123456bi
+#    default-encoding: utf-8
+#    port: 465   # 端口号465或587
+#    protocol: smtp
+#    properties:
+#      mail:
+#        debug:
+#          true
+#        smtp:
+#          ssl:
+#            enable: true
+#          auth: true
+#          starttls:
+#            enable: true
+#            required: true
+#          socketFactory:
+#            class: javax.net.ssl.SSLSocketFactory
+
 

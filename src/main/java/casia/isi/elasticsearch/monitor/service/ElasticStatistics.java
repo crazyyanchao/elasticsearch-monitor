@@ -30,6 +30,7 @@ import casia.isi.elasticsearch.monitor.common.EsUrl;
 import casia.isi.elasticsearch.monitor.common.HttpAccessor;
 import casia.isi.elasticsearch.monitor.common.SysConstant;
 import casia.isi.elasticsearch.monitor.common.TaskAction;
+import casia.isi.elasticsearch.monitor.model.GlobalIndexKpi;
 import casia.isi.elasticsearch.operation.search.EsIndexSearch;
 import casia.isi.elasticsearch.util.ClientUtils;
 import casia.isi.elasticsearch.util.DateUtil;
@@ -278,7 +279,7 @@ public class ElasticStatistics {
     /**
      * @param
      * @return
-     * @Description: TODO(最近24H运行结束的删除任务)
+     * @Description: TODO(最近24H运行的删除任务)
      */
     public JSONObject recentDoneDeleteTask(String address) {
         EsIndexSearch esIndexSearch = new EsIndexSearch(address, ".tasks", "task");
@@ -503,7 +504,7 @@ public class ElasticStatistics {
         EsIndexSearch esIndexSearch = new EsIndexSearch(address, indexName, indexType);
         esIndexSearch.addSortField(timeFiled, sort);
         esIndexSearch.setRow(1);
-        esIndexSearch.execute(new String[]{timeFiled, "it", "gid","data_source","url","md5","user_url","blogger_id","blogger"});
+        esIndexSearch.execute(new String[]{timeFiled, "it", "gid", "data_source", "url", "md5", "user_url", "blogger_id", "blogger"});
         JSONObject jsonObject = JSONObject.parseObject(esIndexSearch.queryJsonResult.toJSONString());
         esIndexSearch.reset();
 
@@ -512,6 +513,35 @@ public class ElasticStatistics {
         search.put("query", esIndexSearch.queryJson);
         jsonObject.put("search", search);
         return jsonObject;
+    }
+
+    /**
+     * @param
+     * @return
+     * @Description: TODO(获取HTML的统计数据)
+     */
+    public String getHTMLInStatistics(String address) {
+//        httpAccessor.removeLastHttpsAddNewAddress(address);
+//        GlobalIndexKpi globalIndexKpi = globalKpi(address);
+        // KPI生成HTML
+        StringBuilder builder = new StringBuilder();
+        String html = FileUtil.readAllLine("config/statistics.html", "UTF-8");
+        builder.append(html);
+        return builder.toString();
+    }
+
+    private GlobalIndexKpi globalKpi(String address) {
+        String info = getClusterBasisInfo(address);
+        JSONObject object = JSONObject.parseObject(info);
+        String clusterName = object.getString("cluster_name_status");
+        int total = object.getIntValue("docs");
+        String store = object.getString("store");
+        int shardsCount = object.getIntValue("shards");
+        int nodeCount = object.getIntValue("nodes");
+        int indicesCount = object.getIntValue("indices");
+        JSONObject deleteObj = recentDoneDeleteTask(address);
+        int deleteTaskCount = deleteObj.getIntValue("count");
+        return new GlobalIndexKpi(clusterName, total, store, shardsCount, nodeCount, indicesCount, deleteTaskCount);
     }
 
 }
