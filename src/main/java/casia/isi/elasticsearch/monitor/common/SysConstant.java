@@ -48,8 +48,8 @@ public class SysConstant {
     public static final String _MONITOR_TASK_INDEX_TYPE = loadProperty(".monitor.task.index.type");
     public static final String _MONITOR_TASK_INDEX_RETAIN_TIME = loadProperty(".monitor.task.index.retain.time");
 
-    public static final String EMAIL_SENDER = loadProperty("email.sender");
-    public static final String EMAIL_SENDER_PASSWORD = loadProperty("email.sender.password");
+//    public static final String EMAIL_SENDER = loadProperty("email.sender");
+//    public static final String EMAIL_SENDER_PASSWORD = loadProperty("email.sender.password");
 
     public static final boolean DEBUG = Boolean.parseBoolean(loadProperty("debug"));
 

@@ -183,14 +183,14 @@ public class MailService {
         session.setDebug(SysConstant.DEBUG);                                 // 设置为debug模式, 可以查看详细的发送 log
 
         // 3. 创建一封邮件
-        MimeMessage message = createMimeMessage(session, SysConstant.EMAIL_SENDER, SysConstant.EMAIL_RECEIVER);
+//        MimeMessage message = createMimeMessage(session, SysConstant.EMAIL_SENDER, SysConstant.EMAIL_RECEIVER);
 
         // 4. 根据 Session 获取邮件传输对象
         Transport transport = session.getTransport();
-        transport.connect(SysConstant.EMAIL_SENDER, SysConstant.EMAIL_SENDER_PASSWORD);
+//        transport.connect(SysConstant.EMAIL_SENDER, SysConstant.EMAIL_SENDER_PASSWORD);
 
         // 5. 发送邮件, 发到所有的收件地址, message.getAllRecipients() 获取到的是在创建邮件对象时添加的所有收件人, 抄送人, 密送人
-        transport.sendMessage(message, message.getAllRecipients());
+//        transport.sendMessage(message, message.getAllRecipients());
         transport.close();         // 6. 关闭连接
     }
 

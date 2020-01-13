@@ -1,0 +1,561 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        /* Border styles */
+        #table-1 thead, #table-1 tr {
+            border-top-width: 1px;
+            border-top-style: solid;
+            border-top-color: #AABFDC;
+            background: #f1d5e2;
+        }
+
+        #table-1 {
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+            border-bottom-color: #AABFDC;
+        }
+
+        /* Padding and font style */
+        #table-1 td, #table-1 th {
+            padding: 5px 10px;
+            font-size: 12px;
+            font-family: Verdana;
+        }
+
+        /*背景色*/
+        .bj_blue td {
+            color: #356a8e;
+            background: #D3DFED;
+        }
+
+        .bj_orange td {
+            color: #a37110;
+            background: #ededbc;
+        }
+
+        .bj_red td {
+            color: #a31e15;
+            background: #edc2bf;
+        }
+    </style>
+</head>
+<body>
+<table id="table-1">
+    <tr class="tb_title">
+        <th>时间</th>
+        <th>字段名</th>
+        <th>总量</th>
+        <th>今日新增</th>
+        <th>今日新增24h百分比</th>
+        <th>今日新增与上次统计百分比</th>
+        <th>新闻</th>
+        <th>博客</th>
+        <th>论坛</th>
+        <th>微博</th>
+        <th>公众号</th>
+        <th>app</th>
+        <th>视频</th>
+    </tr>
+
+    <tr class="bj_blue">
+        <td>2018-02-08 17:00</td>
+        <td>DPI</td>
+        <td>78005560</td>
+        <td>2138251</td>
+        <td>-2.13%</td>
+        <td>1.68%</td>
+        <td>1161125</td>
+        <td>0</td>
+        <td>191228</td>
+        <td>468901</td>
+        <td>193049</td>
+        <td>123948</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-08 17:00</td>
+        <td>DPP</td>
+        <td>78005560</td>
+        <td>1211868</td>
+        <td>0.95%</td>
+        <td>-0.07%</td>
+        <td>554892</td>
+        <td>0</td>
+        <td>26113</td>
+        <td>449181</td>
+        <td>87810</td>
+        <td>93872</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-08 17:00</td>
+        <td>JD</td>
+        <td>336737447</td>
+        <td>1251081</td>
+        <td>1.31%</td>
+        <td>1.05%</td>
+        <td>555931</td>
+        <td>0</td>
+        <td>52971</td>
+        <td>452628</td>
+        <td>88542</td>
+        <td>94108</td>
+        <td>6901</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-08 17:00</td>
+        <td>HS</td>
+        <td>725545647</td>
+        <td>1215681</td>
+        <td>0.92%</td>
+        <td>0.02%</td>
+        <td>556845</td>
+        <td>0</td>
+        <td>26257</td>
+        <td>449602</td>
+        <td>88680</td>
+        <td>94297</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-08 17:00</td>
+        <td>NK</td>
+        <td>426006962</td>
+        <td>1213869</td>
+        <td>0.95%</td>
+        <td>0.01%</td>
+        <td>555865</td>
+        <td>0</td>
+        <td>26182</td>
+        <td>449494</td>
+        <td>88568</td>
+        <td>93760</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-08 17:00</td>
+        <td>CQ</td>
+        <td>545678048</td>
+        <td>1234341</td>
+        <td>0.99%</td>
+        <td>0.55%</td>
+        <td>556000</td>
+        <td>199</td>
+        <td>46314</td>
+        <td>449374</td>
+        <td>88568</td>
+        <td>93886</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-08 17:00</td>
+        <td>CD</td>
+        <td>82940291</td>
+        <td>1213780</td>
+        <td>0.95%</td>
+        <td>-0.00%</td>
+        <td>555706</td>
+        <td>0</td>
+        <td>26196</td>
+        <td>449424</td>
+        <td>88568</td>
+        <td>93886</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-08 17:00</td>
+        <td>KD</td>
+        <td>69350834</td>
+        <td>1214828</td>
+        <td>0.96%</td>
+        <td>0.01%</td>
+        <td>556385</td>
+        <td>0</td>
+        <td>26212</td>
+        <td>449648</td>
+        <td>88568</td>
+        <td>94015</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_orange">
+        <td>2018-02-08 11:00</td>
+        <td>DPP</td>
+        <td>77388320</td>
+        <td>1212670</td>
+        <td>∞%</td>
+        <td>-3.11%</td>
+        <td>530617</td>
+        <td>0</td>
+        <td>28331</td>
+        <td>464428</td>
+        <td>91508</td>
+        <td>97786</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_orange">
+        <td>2018-02-08 11:00</td>
+        <td>KD</td>
+        <td>68733233</td>
+        <td>1214701</td>
+        <td>∞%</td>
+        <td>-98.22%</td>
+        <td>531905</td>
+        <td>0</td>
+        <td>28355</td>
+        <td>464899</td>
+        <td>91740</td>
+        <td>97802</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_orange">
+        <td>2018-02-08 11:00</td>
+        <td>DPI</td>
+        <td>77388320</td>
+        <td>2102837</td>
+        <td>∞%</td>
+        <td>-2.29%</td>
+        <td>1098443</td>
+        <td>0</td>
+        <td>165539</td>
+        <td>490654</td>
+        <td>221541</td>
+        <td>126660</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_orange">
+        <td>2018-02-08 11:00</td>
+        <td>CD</td>
+        <td>82322812</td>
+        <td>1213782</td>
+        <td>∞%</td>
+        <td>-98.52%</td>
+        <td>531390</td>
+        <td>0</td>
+        <td>28347</td>
+        <td>464591</td>
+        <td>91671</td>
+        <td>97783</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_orange">
+        <td>2018-02-08 11:00</td>
+        <td>HS</td>
+        <td>724928337</td>
+        <td>1215405</td>
+        <td>∞%</td>
+        <td>-93.26%</td>
+        <td>532215</td>
+        <td>0</td>
+        <td>28363</td>
+        <td>464928</td>
+        <td>91810</td>
+        <td>98089</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_orange">
+        <td>2018-02-08 11:00</td>
+        <td>JD</td>
+        <td>336096801</td>
+        <td>1238107</td>
+        <td>∞%</td>
+        <td>-97.03%</td>
+        <td>531470</td>
+        <td>0</td>
+        <td>46496</td>
+        <td>467893</td>
+        <td>91671</td>
+        <td>97999</td>
+        <td>2578</td>
+    </tr>
+    <tr class="bj_orange">
+        <td>2018-02-08 11:00</td>
+        <td>CQ</td>
+        <td>545052458</td>
+        <td>1227557</td>
+        <td>∞%</td>
+        <td>-98.77%</td>
+        <td>531645</td>
+        <td>204</td>
+        <td>41677</td>
+        <td>464591</td>
+        <td>91671</td>
+        <td>97769</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_orange">
+        <td>2018-02-08 11:00</td>
+        <td>NK</td>
+        <td>425486294</td>
+        <td>1213737</td>
+        <td>∞%</td>
+        <td>∞%</td>
+        <td>531556</td>
+        <td>0</td>
+        <td>28331</td>
+        <td>464616</td>
+        <td>91671</td>
+        <td>97563</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_red">
+        <td>2018-02-08 08:00</td>
+        <td>DPI</td>
+        <td>77085336</td>
+        <td>2152201</td>
+        <td>∞%</td>
+        <td>-1.50%</td>
+        <td>1125631</td>
+        <td>0</td>
+        <td>155162</td>
+        <td>494945</td>
+        <td>249538</td>
+        <td>126925</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_red">
+        <td>2018-02-08 08:00</td>
+        <td>DPP</td>
+        <td>77085388</td>
+        <td>1251558</td>
+        <td>∞%</td>
+        <td>4.26%</td>
+        <td>555016</td>
+        <td>0</td>
+        <td>29809</td>
+        <td>472574</td>
+        <td>92193</td>
+        <td>101966</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_red">
+        <td>2018-02-08 08:00</td>
+        <td>CQ</td>
+        <td>544745589</td>
+        <td>99755922</td>
+        <td>∞%</td>
+        <td>8061.34%</td>
+        <td>33150950</td>
+        <td>32995</td>
+        <td>16470748</td>
+        <td>18041440</td>
+        <td>26528959</td>
+        <td>5520382</td>
+        <td>10448</td>
+    </tr>
+    <tr class="bj_red">
+        <td>2018-02-08 08:00</td>
+        <td>JD</td>
+        <td>335789431</td>
+        <td>41723405</td>
+        <td>∞%</td>
+        <td>3278.82%</td>
+        <td>12511714</td>
+        <td>0</td>
+        <td>8658262</td>
+        <td>4630379</td>
+        <td>14487813</td>
+        <td>1383440</td>
+        <td>51797</td>
+    </tr>
+    <tr class="bj_red">
+        <td>2018-02-08 08:00</td>
+        <td>CD</td>
+        <td>82020346</td>
+        <td>82020346</td>
+        <td>∞%</td>
+        <td>6721.62%</td>
+        <td>29262305</td>
+        <td>18668</td>
+        <td>18348211</td>
+        <td>14225203</td>
+        <td>15967015</td>
+        <td>4198944</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_red">
+        <td>2018-02-08 08:00</td>
+        <td>KD</td>
+        <td>68430276</td>
+        <td>68430276</td>
+        <td>∞%</td>
+        <td>5587.09%</td>
+        <td>28691084</td>
+        <td>17604</td>
+        <td>15791703</td>
+        <td>14193531</td>
+        <td>5621452</td>
+        <td>4114900</td>
+        <td>2</td>
+    </tr>
+    <tr class="bj_red">
+        <td>2018-02-08 08:00</td>
+        <td>HS</td>
+        <td>724624972</td>
+        <td>18043998</td>
+        <td>∞%</td>
+        <td>1397.93%</td>
+        <td>8510264</td>
+        <td>0</td>
+        <td>1358643</td>
+        <td>4914565</td>
+        <td>1840112</td>
+        <td>1420414</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-07 17:00</td>
+        <td>DPP</td>
+        <td>75864090</td>
+        <td>1200433</td>
+        <td>-10.57%</td>
+        <td>∞%</td>
+        <td>518178</td>
+        <td>0</td>
+        <td>19200</td>
+        <td>469751</td>
+        <td>95548</td>
+        <td>97756</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-07 17:00</td>
+        <td>DPI</td>
+        <td>75864010</td>
+        <td>2184870</td>
+        <td>-5.38%</td>
+        <td>∞%</td>
+        <td>1109846</td>
+        <td>0</td>
+        <td>118074</td>
+        <td>489305</td>
+        <td>336798</td>
+        <td>130847</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-07 17:00</td>
+        <td>JD</td>
+        <td>334536667</td>
+        <td>1234852</td>
+        <td>∞%</td>
+        <td>∞%</td>
+        <td>519345</td>
+        <td>0</td>
+        <td>45559</td>
+        <td>473510</td>
+        <td>96397</td>
+        <td>98004</td>
+        <td>2037</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-07 17:00</td>
+        <td>CQ</td>
+        <td>543504413</td>
+        <td>1222299</td>
+        <td>∞%</td>
+        <td>∞%</td>
+        <td>519134</td>
+        <td>192</td>
+        <td>38839</td>
+        <td>469962</td>
+        <td>96397</td>
+        <td>97775</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-07 17:00</td>
+        <td>NK</td>
+        <td>424182602</td>
+        <td>1202432</td>
+        <td>∞%</td>
+        <td>∞%</td>
+        <td>519132</td>
+        <td>0</td>
+        <td>19188</td>
+        <td>470134</td>
+        <td>96436</td>
+        <td>97542</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-07 17:00</td>
+        <td>HS</td>
+        <td>723405433</td>
+        <td>1204596</td>
+        <td>∞%</td>
+        <td>∞%</td>
+        <td>520687</td>
+        <td>0</td>
+        <td>19176</td>
+        <td>470335</td>
+        <td>96436</td>
+        <td>97962</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-07 17:00</td>
+        <td>CD</td>
+        <td>82161354</td>
+        <td>1202359</td>
+        <td>∞%</td>
+        <td>∞%</td>
+        <td>519041</td>
+        <td>0</td>
+        <td>19221</td>
+        <td>469927</td>
+        <td>96397</td>
+        <td>97773</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-07 17:00</td>
+        <td>KD</td>
+        <td>67208929</td>
+        <td>1203257</td>
+        <td>∞%</td>
+        <td>∞%</td>
+        <td>519689</td>
+        <td>0</td>
+        <td>19223</td>
+        <td>470134</td>
+        <td>96436</td>
+        <td>97775</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-06 17:00</td>
+        <td>DPP</td>
+        <td>73786545</td>
+        <td>1342381</td>
+        <td>∞%</td>
+        <td>∞%</td>
+        <td>623493</td>
+        <td>0</td>
+        <td>25698</td>
+        <td>492110</td>
+        <td>100897</td>
+        <td>100183</td>
+        <td>0</td>
+    </tr>
+    <tr class="bj_blue">
+        <td>2018-02-06 17:00</td>
+        <td>DPI</td>
+        <td>73765238</td>
+        <td>2309138</td>
+        <td>∞%</td>
+        <td>∞%</td>
+        <td>1122167</td>
+        <td>0</td>
+        <td>196915</td>
+        <td>525682</td>
+        <td>327447</td>
+        <td>136927</td>
+        <td>0</td>
+    </tr>
+
+</table>
+</body>
+</html>
+
