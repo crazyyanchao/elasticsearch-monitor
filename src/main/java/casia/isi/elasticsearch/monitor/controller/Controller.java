@@ -176,6 +176,9 @@ public class Controller {
         mailBean.setSubject("[Daily Report]-CASIA AliYun Elasticsearch Monitor");
         try {
             mailService.sendSimpleMail(mailBean);
+            // 再发一封邮件
+            mailBean.setContent(elasticStatistics.getHTMLInStatistics(SysConstant.ELASTICSEARCH_ADDRESS)); // 后台定时任务监控预警配置的集群
+            mailService.sendMailHtml(mailBean);
         } catch (Exception e) {
             e.printStackTrace();
         }
