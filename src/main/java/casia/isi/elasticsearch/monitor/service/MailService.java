@@ -2,7 +2,7 @@ package casia.isi.elasticsearch.monitor.service;
 
 import casia.isi.elasticsearch.monitor.common.SysConstant;
 import casia.isi.elasticsearch.monitor.entity.MailBean;
-import casia.isi.elasticsearch.util.FileUtil;
+import ch.qos.logback.core.util.FileUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang3.StringUtils;
